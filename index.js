@@ -90,8 +90,10 @@ class Container {
 
   handleMouseLeave() {
     this.el.addEventListener('mouseleave', () => {
-      this.currentRange = this.currentSelection && this.currentSelection.getRangeAt(0);
-      event.fire('rangechange', this.currentRange);
+      if (this.currentSelection) {
+        this.currentRange = this.currentSelection.getRangeAt(0);
+        event.fire('rangechange', this.currentRange);
+      }
     })
   }
 }
