@@ -1,0 +1,20 @@
+.app {
+  width: 400px;
+  height: 200px;
+  border: 1px solid #ccc;
+}
+.rich-editor {
+  width: 400px;
+  height: 400px;
+}
+.rich-editor_menu {
+  height: 28px;
+}
+.rich-editor_menu-item.active {
+  color: blue;
+}
+.rich-editor_container {
+  height: calc(100% - 28px);
+  width: 100%;
+  border: 1px solid #ccc;
+}
