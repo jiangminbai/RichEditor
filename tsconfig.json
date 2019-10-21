@@ -1,0 +1,5 @@
+{
+  "compilerOptions": {
+    "target": "es6", // 要使用es6的新语法必须得指定es6
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "richeditor",
+  "version": "1.0.0",
+  "description": "a richer editor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jan-wong/RichEditor.git"
+  },
+  "keywords": [
+    "typescript",
+    "editor"
+  ],
+  "author": "Jan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jan-wong/RichEditor/issues"
+  },
+  "homepage": "https://github.com/jan-wong/RichEditor#readme",
+  "devDependencies": {
+    "ts-loader": "^6.2.0",
+    "typescript": "^3.6.4",
+    "webpack": "^4.41.2"
+  }
+}
