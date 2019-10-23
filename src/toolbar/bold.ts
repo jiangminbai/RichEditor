@@ -15,15 +15,6 @@ class Bold extends BaseToolbar {
   execCommand(){
     document.execCommand('bold');
   }
-
-  handleClick() {
-    this.el.addEventListener('click', () => {
-      this.changeActive();
-      event.fire('restorerange');
-      document.execCommand('bold');
-      event.fire('resetrange');
-    })
-  }
 }
 
 export default Bold;
