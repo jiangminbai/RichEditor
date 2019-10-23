@@ -1,18 +1,19 @@
-import Toolbar from "./toolbar";
-import event from '../util/emitter'
+import BaseToolbar from "../core/baseToolbar";
+import event from '../core/emitter'
 
-class Bold extends Toolbar {
-  constructor() {
-    super();
-    this.selected = false;
-    this.el = document.querySelector('.menu-item-bold');
-    this.handleClick();
-    event.on('rangechange', currentRange => {
-      const startContainer = currentRange.startContainer;
-      const parent = startContainer.parentNode;
-      const tagName = parent.tagName;
-      tagName === 'B' ? this.setActive() : this.resetActive();
-    })
+class Bold extends BaseToolbar {
+  createToolbarElement() {
+    const toolbar = document.createElement('span');
+    toolbar.innerHTML = 'B';
+    return toolbar;
+  }
+
+  getTagName() {
+    return 'B';
+  }
+
+  execCommand(){
+    document.execCommand('bold');
   }
 
   handleClick() {

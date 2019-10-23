@@ -1,4 +1,4 @@
-import event from "../util/emitter";
+import event from "./emitter";
 import Bold from '../toolbar/bold';
 
 class RichEditor {
