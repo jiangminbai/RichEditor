@@ -1,15 +1,27 @@
 import event from "./emitter";
+import BaseToolbar from './baseToolbar';
 import Bold from '../toolbar/bold';
+import Registry from './registry';
+
+// 参数接口
+interface Options {
+  el: HTMLElement;
+}
 
 class RichEditor {
+  public static Toolbar: typeof BaseToolbar = BaseToolbar; // 给工具栏提供接口
+  
   el: HTMLElement;
   currentSelection: Selection = null;
   currentRange: Range = null;
+  registry: Registry = new Registry(); // 插件管理器
+  
+  constructor(options: Options) {
+    if (!options.el) throw Error('el option is must');
 
-  constructor() {
-    this.el = document.querySelector('.rich-editor_container');
+    this.el = options.el;
     this.initEditor();
-    this.initToolbar();
+    this.installToolbar();
   }
 
   initEditor() {
@@ -23,8 +35,15 @@ class RichEditor {
     event.on('resetrange', this.resetRange.bind(this));
   }
 
-  initToolbar() {
-    new Bold();
+  installToolbar() {
+    const toolbarContainer = document.createElement('div');
+    toolbarContainer.classList.add('richeditor_toolbarmenu');
+    this.el.appendChild(toolbarContainer);
+
+  }
+
+  registerPlugin(name: string, toolbar: BaseToolbar) {
+    this.registry.registryPlugin(name, toolbar);
   }
 
   appendP() {

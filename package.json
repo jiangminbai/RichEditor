@@ -2,7 +2,7 @@
   "name": "richeditor",
   "version": "1.0.0",
   "description": "a richer editor",
-  "main": "index.js",
+  "main": "RickEditor.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,6 +23,7 @@
   "devDependencies": {
     "ts-loader": "^6.2.0",
     "typescript": "^3.6.4",
-    "webpack": "^4.41.2"
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9"
   }
 }

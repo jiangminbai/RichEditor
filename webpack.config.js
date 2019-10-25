@@ -3,6 +3,7 @@ const path = require('path');
 
 // webpack配置对象
 const webpackConfig = {
+  // mode: 'development',
   entry: './src/core/RichEditor.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
