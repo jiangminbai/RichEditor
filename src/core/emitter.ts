@@ -5,24 +5,21 @@ class Emitter {
   events: object = {};
 
   on(type: string, fn: Function) {
-    this.events[type] ? this.events[type].push(fn) : this.events[type] = [fn];
+    (this.events[type] || (this.events[type] = [])).push(fn);
   }
 
   once(type: string, fn: Function) {
-    const onceFn = (...args: any) => {
+    (this.events[type] || (this.events[type] = [])).push((...args: any) => {
       fn(...args);
       this.off(type, fn);
-    }
-    this.events[type] ? this.events[type].push(onceFn): this.events[type] = [onceFn];
+    })
   }
 
   off(type: string, fn: Function) {
-    this.events[type] && this.events[type].forEach(item => {
-      if (item === fn) {
-        const index = this.events[type].indexOf(fn);
-        if (index > -1) this.events[type].splice(index, 1);
-      }
-    })
+    if (this.events[type]) {
+      const index = this.events[type].indexOf(fn);
+      if (index !== -1) this.events[type].splice(index, 1);
+    }
   }
 
   fire(type: string, ...args: any) {
