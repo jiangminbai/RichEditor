@@ -3,8 +3,8 @@
  */
 
 import registry from './registry';
-import AbstractToolbar from './abstractToolbar';
 import Bold from '../toolbar/bold';
+import Italic from '../toolbar/italic';
 
 class ToolbarManager {
   el: HTMLElement;
@@ -24,6 +24,10 @@ class ToolbarManager {
       {
         name: 'bold',
         module: new Bold()
+      },
+      {
+        name: 'italic',
+        module: new Italic()
       }
     ]
 

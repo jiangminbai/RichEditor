@@ -5,7 +5,7 @@ import svgs from './svgs';
 abstract class AbstractToolbar {
   el: HTMLElement;
   selected: boolean;
-  tagName: string;
+  tagName: string | string[];
   registry: typeof registry;
   svgs: typeof svgs;
 
@@ -40,9 +40,21 @@ abstract class AbstractToolbar {
 
   handleRangeChange(currentRange) {
     const startContainer = currentRange.startContainer;
-    const parent = startContainer.parentNode;
-    const tagName = parent.tagName;
-    tagName === this.tagName ? this.setActive() : this.resetActive();
+    let node = startContainer;
+    let tagNameChain = []; // 点击位置往上搜集的节点标签名链
+    
+    while((node = node.parentNode) && node.tagName !== 'P') {
+      tagNameChain.push(node.tagName);
+    }
+
+    if (typeof this.tagName === 'string') {
+      tagNameChain.indexOf(this.tagName) > -1 ? this.setActive() : this.resetActive();
+    } else {
+      let isSelected = this.tagName.some(item => {
+        return tagNameChain.indexOf(item) > -1;
+      })
+      isSelected ? this.setActive() : this.resetActive();
+    }
   }
 
   setActive() {
