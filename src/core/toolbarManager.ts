@@ -7,6 +7,11 @@ import Bold from '../toolbar/bold';
 import Italic from '../toolbar/italic';
 import Underline from '../toolbar/underline';
 import StrikeThrough from '../toolbar/strikeThrough';
+import JustifyLeft from '../toolbar/justifyLeft';
+import JustifyCenter from '../toolbar/justifyCenter';
+import JustifyRight from '../toolbar/justifyRight';
+import OrderedList from '../toolbar/orderedList';
+import UnorderedList from '../toolbar/unorderedList';
 
 class ToolbarManager {
   el: HTMLElement;
@@ -38,6 +43,26 @@ class ToolbarManager {
       {
         name: 'strike-through',
         module: new StrikeThrough()
+      },
+      {
+        name: 'justify-left',
+        module: new JustifyLeft()
+      },
+      {
+        name: 'justify-center',
+        module: new JustifyCenter()
+      },
+      {
+        name: 'justify-right',
+        module: new JustifyRight()
+      },
+      {
+        name: 'ordered-list',
+        module: new OrderedList()
+      },
+      {
+        name: 'unordered-list',
+        module: new UnorderedList()
       }
     ]
 
