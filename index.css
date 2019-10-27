@@ -3,18 +3,23 @@
   height: 200px;
   border: 1px solid #ccc;
 }
-.rich-editor {
+.richeditor {
   width: 400px;
   height: 400px;
 }
-.rich-editor_menu {
+.richeditor_toolbar {
   height: 28px;
 }
-.rich-editor_menu-item.active {
-  color: blue;
+.richeditor_toolbarItem {
+  display: inline-flex;
+  border: 1px solid transparent;
 }
-.rich-editor_container {
+.richeditor_toolbarItem.active {
+  border: 1px solid gray;
+}
+.richeditor_area {
   height: calc(100% - 28px);
   width: 100%;
   border: 1px solid #ccc;
+  outline: none;
 }

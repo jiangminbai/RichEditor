@@ -12,7 +12,7 @@ interface Plugin {
 
 // 插件管理器类
 class Registry {
-  plugins: Plugin[]
+  plugins: Plugin[] = [];
 
   registryPlugin(name:string, toolbar: AbstractToolbar) {
     this.plugins.push({

@@ -42,6 +42,7 @@ class RichEditor {
     this.registry.registryPlugin(name, toolbar);
     this.toolbarManager.el.appendChild(toolbar.el);
   }
+  
 }
 
 export default RichEditor;

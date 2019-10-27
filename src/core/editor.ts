@@ -13,17 +13,19 @@ class Editor {
     this.el.className = 'richeditor_area';
     this.el.setAttribute('contenteditable', 'true');
     container.appendChild(this.el);
+    this.init();
 
+    // this.el.addEventListener('mousedown', this.handleMouseDown.bind(this));
+    this.el.addEventListener('mouseup', this.handleMouseup.bind(this));
+    this.el.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
     event.on('restorerange', this.restoreRange.bind(this));
     event.on('resetrange', this.resetRange.bind(this));
   }
 
   init() {
+    this.currentSelection = window.getSelection();
     this.appendP();
     this.handleLine();
-    this.handleMouseDown();
-    this.handleMouseLeave();
-    this.handleMouseup();
   }
 
   // 使编辑器内部填充p标签
@@ -45,26 +47,20 @@ class Editor {
     })
   }
 
-  handleMouseDown() {
-    this.el.addEventListener('mousedown', () => {
-      this.currentSelection = this.currentSelection || window.getSelection();
-    })
-  }
+  // handleMouseDown() {
+  //   this.currentSelection = this.currentSelection;
+  // }
 
   handleMouseup() {
-    this.el.addEventListener('mouseup', () => {
-      this.currentRange = this.currentSelection.getRangeAt(0);
-      event.fire('rangechange', this.currentRange);
-    })
+    this.currentRange = this.currentSelection.getRangeAt(0);
+    event.fire('rangechange', this.currentRange);
   }
 
   handleMouseLeave() {
-    this.el.addEventListener('mouseleave', () => {
-      if (this.currentSelection) {
-        this.currentRange = this.currentSelection.getRangeAt(0);
-        event.fire('rangechange', this.currentRange);
-      }
-    })
+    if (this.currentSelection && this.currentSelection.rangeCount) {
+      this.currentRange = this.currentSelection.getRangeAt(0);
+      event.fire('rangechange', this.currentRange);
+    }
   }
 
   restoreRange() {

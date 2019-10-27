@@ -6,10 +6,6 @@ import registry from './registry';
 import AbstractToolbar from './abstractToolbar';
 import Bold from '../toolbar/bold';
 
-interface Plugins {
-  [name: string]: AbstractToolbar;
-}
-
 class ToolbarManager {
   el: HTMLElement;
 

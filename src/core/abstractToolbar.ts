@@ -1,37 +1,48 @@
 import event from './emitter';
+import registry from './registry';
+import svgs from './svgs';
 
 abstract class AbstractToolbar {
   el: HTMLElement;
-  selected: boolean = false;
+  selected: boolean;
+  tagName: string;
+  registry: typeof registry;
+  svgs: typeof svgs;
 
   constructor() {
-    this.el = this.createToolbarElement();
-    this.handleClick();
-    this.handleRangeChange();
+    this.selected = false;
+    this.tagName = 'div';
+    this.registry = registry;
+    this.svgs = svgs;
+    this.createElement();
+
+    this.el.addEventListener('click', this.handleClick.bind(this));
+    event.on('rangechange', this.handleRangeChange.bind(this));
   }
 
-  abstract createToolbarElement(): HTMLElement
+  // 创建toolbar的按钮
+  abstract create(): void;
+  // toolbar按钮被点击
+  abstract clicked(): void;
 
-  abstract getTagName(): string;
-
-  abstract execCommand(): void;
+  createElement() {
+    this.el = document.createElement('span');
+    this.el.className = 'richeditor_toolbarItem';
+    this.create();
+  }
 
   handleClick() {
-    this.el.addEventListener('click', () => {
-      this.changeActive();
-      event.fire('restorerange');
-      this.execCommand();
-      event.fire('resetrange');
-    })
+    this.changeActive();
+    event.fire('restorerange');
+    this.clicked();
+    event.fire('resetrange');
   }
 
-  handleRangeChange() {
-    event.on('rangechange', currentRange => {
-      const startContainer = currentRange.startContainer;
-      const parent = startContainer.parentNode;
-      const tagName = parent.tagName;
-      tagName === this.getTagName() ? this.setActive() : this.resetActive();
-    })
+  handleRangeChange(currentRange) {
+    const startContainer = currentRange.startContainer;
+    const parent = startContainer.parentNode;
+    const tagName = parent.tagName;
+    tagName === this.tagName ? this.setActive() : this.resetActive();
   }
 
   setActive() {

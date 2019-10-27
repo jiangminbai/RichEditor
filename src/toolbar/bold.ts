@@ -1,17 +1,16 @@
 import AbstractToolbar from "../core/abstractToolbar";
 
 class Bold extends AbstractToolbar {
-  getTagName() {
-    return 'B';
+  constructor() {
+    super();
+    this.tagName = 'B';
   }
 
-  createToolbarElement() {
-    const toolbar = document.createElement('span');
-    toolbar.innerHTML = 'B';
-    return toolbar;
+  create() {
+    this.el.innerHTML = this.svgs.bold;
   }
 
-  execCommand(){
+  clicked(){
     document.execCommand('bold');
   }
 }

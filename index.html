@@ -8,17 +8,12 @@
   <link rel="stylesheet" href="./index.css">
 </head>
 <body>
-<div class="rich-editor">
-  <div class="rich-editor_menu">
-    <span class="rich-editor_menu-item menu-item-bold">B</span>
-  </div>
-  <div class="rich-editor_container" contenteditable="true">
+<div class="richeditor">
 
-  </div>
 </div>
 <script src="./dist/RichEditor.js"></script>
 <script>
-  new RichEditor();
+  new RichEditor({el: document.querySelector('.richeditor')});
 </script>
 </body>
 </html>
