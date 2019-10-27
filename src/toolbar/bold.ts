@@ -1,3 +1,6 @@
+/**
+ * 粗体
+ */
 import AbstractToolbar from "../core/abstractToolbar";
 
 class Bold extends AbstractToolbar {

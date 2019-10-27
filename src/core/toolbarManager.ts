@@ -5,6 +5,8 @@
 import registry from './registry';
 import Bold from '../toolbar/bold';
 import Italic from '../toolbar/italic';
+import Underline from '../toolbar/underline';
+import StrikeThrough from '../toolbar/strikeThrough';
 
 class ToolbarManager {
   el: HTMLElement;
@@ -28,6 +30,14 @@ class ToolbarManager {
       {
         name: 'italic',
         module: new Italic()
+      },
+      {
+        name: 'underline',
+        module: new Underline()
+      },
+      {
+        name: 'strike-through',
+        module: new StrikeThrough()
       }
     ]
 

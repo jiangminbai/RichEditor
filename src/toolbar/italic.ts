@@ -1,3 +1,6 @@
+/**
+ * 斜体
+ */
 import AbstractToolbar from '../core/abstractToolbar';
 
 class Italic extends AbstractToolbar {
