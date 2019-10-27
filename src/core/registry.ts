@@ -1,4 +1,4 @@
-import BaseToolbar from "./baseToolbar"
+import AbstractToolbar from "./abstractToolbar"
 
 /**
  * 插件注册器：微核通过此注册器来管理工具插件
@@ -7,14 +7,14 @@ import BaseToolbar from "./baseToolbar"
 // 插件类型
 interface Plugin {
   name: string,
-  module: BaseToolbar
+  module: AbstractToolbar
 }
 
 // 插件管理器类
 class Registry {
   plugins: Plugin[]
 
-  registryPlugin(name:string, toolbar: BaseToolbar) {
+  registryPlugin(name:string, toolbar: AbstractToolbar) {
     this.plugins.push({
       name,
       module: toolbar
@@ -26,4 +26,4 @@ class Registry {
   }
 }
 
-export default Registry;
+export default new Registry();

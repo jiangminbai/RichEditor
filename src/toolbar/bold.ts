@@ -1,7 +1,6 @@
-import BaseToolbar from "../core/baseToolbar";
-import event from '../core/emitter'
+import AbstractToolbar from "../core/abstractToolbar";
 
-class Bold extends BaseToolbar {
+class Bold extends AbstractToolbar {
   getTagName() {
     return 'B';
   }

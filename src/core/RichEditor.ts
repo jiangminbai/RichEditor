@@ -2,10 +2,11 @@
  * 富文本编辑器类
  */
 
+import AbstractToolbar from './abstractToolbar';
+import registry from './registry';
+import ToolbarManager from './toolbarManager';
 import Editor from './editor';
-import BaseToolbar from './baseToolbar';
-import Bold from '../toolbar/bold';
-import Registry from './registry';
+import svgs from './svgs';
 
 // 参数接口
 interface Options {
@@ -13,28 +14,33 @@ interface Options {
 }
 
 class RichEditor {
-  public static Toolbar: typeof BaseToolbar = BaseToolbar; // 给工具栏提供接口
+  public static Toolbar: typeof AbstractToolbar = AbstractToolbar; // 给工具栏提供接口
   
   el: HTMLElement;
-  registry: Registry = new Registry(); // 插件管理器
+  svgs: typeof svgs;
+  registry: typeof registry; // 插件管理器
+  toolbarManager: ToolbarManager;
   editor: Editor; // 编辑器区域
   
   constructor(options: Options) {
     if (!options.el) throw Error('el option is must');
 
     this.el = options.el;
+    this.svgs = svgs;
+    this.registry = registry;
+    this.toolbarManager = new ToolbarManager(this.el);
     this.editor = new Editor(this.el);
-    this.installToolbar();
   }
 
-  installToolbar() {
-    const toolbarContainer = document.createElement('div');
-    toolbarContainer.className = 'richeditor_toolbarmenu';
-    this.el.appendChild(toolbarContainer);
+  // 对外提供增加svg的接口
+  addIcon(name: string, svg: string) {
+    this.svgs[name] = svg;
   }
 
-  registerPlugin(name: string, toolbar: BaseToolbar) {
+  // 对外提供注册插件的接口
+  registerPlugin(name: string, toolbar: AbstractToolbar) {
     this.registry.registryPlugin(name, toolbar);
+    this.toolbarManager.el.appendChild(toolbar.el);
   }
 }
 

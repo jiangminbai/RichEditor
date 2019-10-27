@@ -1,6 +1,6 @@
 import event from './emitter';
 
-abstract class BaseToolbar {
+abstract class AbstractToolbar {
   el: HTMLElement;
   selected: boolean = false;
 
@@ -47,4 +47,4 @@ abstract class BaseToolbar {
   }
 }
 
-export default BaseToolbar;
+export default AbstractToolbar;
