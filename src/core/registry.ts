@@ -1,24 +1,28 @@
 import BaseToolbar from "./baseToolbar"
 
 /**
- * 插件管理器：微核通过此管理器来管理和查找插件
+ * 插件注册器：微核通过此注册器来管理工具插件
  */
 
 // 插件类型
- class Plugins {
-  [key: string]: BaseToolbar;
+interface Plugin {
+  name: string,
+  module: BaseToolbar
 }
 
 // 插件管理器类
 class Registry {
-  plugins: Plugins = {};
+  plugins: Plugin[]
 
   registryPlugin(name:string, toolbar: BaseToolbar) {
-    this.plugins[name] = toolbar;
+    this.plugins.push({
+      name,
+      module: toolbar
+    })
   }
 
-  find(name: string) {
-    return this.plugins[name];
+  require(name: string) {
+    return this.plugins.find(plugin => plugin[name]);
   }
 }
 

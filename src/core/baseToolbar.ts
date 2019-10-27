@@ -7,12 +7,7 @@ abstract class BaseToolbar {
   constructor() {
     this.el = this.createToolbarElement();
     this.handleClick();
-    event.on('rangechange', currentRange => {
-      const startContainer = currentRange.startContainer;
-      const parent = startContainer.parentNode;
-      const tagName = parent.tagName;
-      tagName === this.getTagName() ? this.setActive() : this.resetActive();
-    })
+    this.handleRangeChange();
   }
 
   abstract createToolbarElement(): HTMLElement
@@ -27,6 +22,15 @@ abstract class BaseToolbar {
       event.fire('restorerange');
       this.execCommand();
       event.fire('resetrange');
+    })
+  }
+
+  handleRangeChange() {
+    event.on('rangechange', currentRange => {
+      const startContainer = currentRange.startContainer;
+      const parent = startContainer.parentNode;
+      const tagName = parent.tagName;
+      tagName === this.getTagName() ? this.setActive() : this.resetActive();
     })
   }
 
