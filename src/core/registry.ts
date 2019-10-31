@@ -1,5 +1,3 @@
-import AbstractToolbar from "./abstractToolbar"
-
 /**
  * 插件注册器：微核通过此注册器来管理工具插件
  */
@@ -7,22 +5,31 @@ import AbstractToolbar from "./abstractToolbar"
 // 插件类型
 interface Plugin {
   name: string,
-  module: AbstractToolbar
+  module: any
 }
 
 // 插件管理器类
 class Registry {
   plugins: Plugin[] = [];
+  controls: any = {};
 
-  registryPlugin(name:string, toolbar: AbstractToolbar) {
+  registerPlugin(name:string, toolbar) {
     this.plugins.push({
       name,
       module: toolbar
     })
   }
 
-  require(name: string) {
+  requirePlugin(name: string) {
     return this.plugins.find(plugin => plugin[name]);
+  }
+
+  registerControl(name: string, control) {
+    this.controls[name] = control;
+  }
+
+  requireControl(name: string) {
+    return this.controls[name];
   }
 }
 

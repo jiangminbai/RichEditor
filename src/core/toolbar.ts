@@ -1,0 +1,83 @@
+/**
+ * 工具栏类
+ */
+
+import registry from './registry';
+import RichEditor from './richEditor';
+import Bold from '../tools/bold';
+import Italic from '../tools/italic';
+import Underline from '../tools/underline';
+import StrikeThrough from '../tools/strikeThrough';
+import JustifyLeft from '../tools/justifyLeft';
+import JustifyCenter from '../tools/justifyCenter';
+import JustifyRight from '../tools/justifyRight';
+import OrderedList from '../tools/orderedList';
+import UnorderedList from '../tools/unorderedList';
+
+class Toolbar {
+  el: HTMLElement;
+
+  constructor(container: HTMLElement) {
+    this.el = document.createElement('div');
+    this.el.className = 'richeditor_toolbar';
+    container.appendChild(this.el);
+  }
+
+  // 注册插件列表
+  registerPlugins(editor: RichEditor) {
+    const plugins = [
+      {
+        name: 'bold',
+        module: new Bold()
+      },
+      {
+        name: 'italic',
+        module: new Italic()
+      },
+      {
+        name: 'underline',
+        module: new Underline()
+      },
+      {
+        name: 'strike-through',
+        module: new StrikeThrough()
+      },
+      {
+        name: 'ordered-list',
+        module: new OrderedList()
+      },
+      {
+        name: 'unordered-list',
+        module: new UnorderedList()
+      },
+      // {
+      //   name: 'justify-left',
+      //   module: new JustifyLeft()
+      // },
+      // {
+      //   name: 'justify-center',
+      //   module: new JustifyCenter()
+      // },
+      // {
+      //   name: 'justify-right',
+      //   module: new JustifyRight()
+      // },
+    ]
+
+    plugins.forEach(plugin => {
+      this.register(plugin.name, plugin.module);
+      // this.el.appendChild(plugin.module.el);
+      if (plugin.module.install) plugin.module.install(editor);
+    })
+  }
+  
+  register(name: string, toolbar) {
+    registry.registerPlugin(name, toolbar);
+  }
+
+  require(name: string) {
+    return registry.requirePlugin(name);
+  }
+}
+
+export default Toolbar;

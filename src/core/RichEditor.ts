@@ -2,9 +2,8 @@
  * 富文本编辑器类
  */
 
-import AbstractToolbar from './abstractToolbar';
-import registry from './registry';
-import ToolbarManager from './toolbarManager';
+import Toolbar from './toolbar';
+import Control from './control';
 import Editor from './editor';
 import svgs from './svgs';
 
@@ -14,12 +13,10 @@ interface Options {
 }
 
 class RichEditor {
-  public static Toolbar: typeof AbstractToolbar = AbstractToolbar; // 给工具栏提供接口
-  
   el: HTMLElement;
-  svgs: typeof svgs;
-  registry: typeof registry; // 插件管理器
-  toolbarManager: ToolbarManager;
+  svgs: typeof svgs; // 图标管理器
+  toolbar: Toolbar; // 工具栏管理器
+  control: Control; // 控件管理器
   editor: Editor; // 编辑器区域
   
   constructor(options: Options) {
@@ -27,22 +24,18 @@ class RichEditor {
 
     this.el = options.el;
     this.svgs = svgs;
-    this.registry = registry;
-    this.toolbarManager = new ToolbarManager(this.el);
+    this.control = new Control();
+    this.toolbar = new Toolbar(this.el);
     this.editor = new Editor(this.el);
+
+    // 注册内置工具栏插件
+    this.toolbar.registerPlugins(this);
   }
 
   // 对外提供增加svg的接口
   addIcon(name: string, svg: string) {
     this.svgs[name] = svg;
   }
-
-  // 对外提供注册插件的接口
-  registerPlugin(name: string, toolbar: AbstractToolbar) {
-    this.registry.registryPlugin(name, toolbar);
-    this.toolbarManager.el.appendChild(toolbar.el);
-  }
-  
 }
 
 export default RichEditor;

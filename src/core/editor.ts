@@ -1,31 +1,33 @@
 /**
  * 编辑器区域类
  */
-import event from './emitter';
+import Emitter from './emitter';
 
-class Editor {
+interface MatchPattern {
+  type: string, // 可选值'tagName' | 'style' 
+  value: any // type为‘tagname’时，value为string；type为‘style’时，value为对象
+}
+
+class Editor extends Emitter {
   el: HTMLElement;
   currentSelection: Selection;
   currentRange: Range;
 
   constructor(container: HTMLElement) {
+    super();
+
     this.el = document.createElement('div');
     this.el.className = 'richeditor_area';
     this.el.setAttribute('contenteditable', 'true');
     container.appendChild(this.el);
-    this.init();
 
-    // this.el.addEventListener('mousedown', this.handleMouseDown.bind(this));
-    this.el.addEventListener('mouseup', this.handleMouseup.bind(this));
-    this.el.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
-    event.on('restorerange', this.restoreRange.bind(this));
-    event.on('resetrange', this.resetRange.bind(this));
-  }
-
-  init() {
     this.currentSelection = window.getSelection();
     this.appendP();
-    this.handleLine();
+
+    this.el.addEventListener('mouseup', this.fireRangeChange.bind(this));
+    this.el.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+    this.el.addEventListener('keyup', this.handleLine.bind(this)); // 使用keyup监听，使用keydown的话函数执行会超前一步
+    // event.on('restorerange', this.restoreRange.bind(this));
   }
 
   // 使编辑器内部填充p标签
@@ -37,39 +39,68 @@ class Editor {
   }
 
   // 使编辑器内部始终存在一个p标签
-  handleLine() {
-    this.el.addEventListener('keydown', (e) => {
-      setTimeout(() => {
-        if (e.keyCode === 8 && this.el.querySelectorAll('p').length === 0) {
-          this.appendP()
-      }
-      }, 100);
-    })
-  }
-
-  // handleMouseDown() {
-  //   this.currentSelection = this.currentSelection;
-  // }
-
-  handleMouseup() {
-    this.currentRange = this.currentSelection.getRangeAt(0);
-    event.fire('rangechange', this.currentRange);
-  }
-
-  handleMouseLeave() {
-    if (this.currentSelection && this.currentSelection.rangeCount) {
-      this.currentRange = this.currentSelection.getRangeAt(0);
-      event.fire('rangechange', this.currentRange);
+  handleLine(e) {
+    if (e.keyCode === 8 && this.el.querySelectorAll('p').length === 0) {
+      this.appendP()
     }
   }
 
-  restoreRange() {
-    this.currentSelection.removeAllRanges();
-    this.currentSelection.addRange(this.currentRange);
+  // 当执行document.execCommand时，Selection.getRangeAt(0)中的range对象会被覆盖掉
+  getRange(): any {
+    return this.currentSelection.rangeCount ? this.currentSelection.getRangeAt(0): null;
   }
 
-  resetRange() {
-    this.currentRange = this.currentSelection.getRangeAt(0);
+  // 选区范围对象发生变化
+  fireRangeChange() {
+    this.fire('rangechange', this.getRange());
+  }
+
+  // 当鼠标离开编辑区域时，为了恢复选区而保存选区范围对象
+  handleMouseLeave() {
+    if (this.currentSelection && this.currentSelection.rangeCount) {
+      this.currentRange = this.currentSelection.getRangeAt(0);
+    }
+  }
+
+  // 恢复选区
+  // 当点击toolbar时，编辑区会失去焦点, range对象无法通过selection.getRangeAt(0)获取
+  restoreSelection() {
+    if (this.currentRange) {
+      this.currentSelection.removeAllRanges();
+      this.currentSelection.addRange(this.currentRange);
+      // 执行execCommand时，this.currentRange对象已经改变
+      setTimeout(() => {
+        this.currentRange = this.getRange();
+        this.fireRangeChange();
+      }, 0);
+    }
+  }
+
+  // 选中选区是否与工具栏模式匹配
+  match(matchPattern: MatchPattern): boolean {
+    const range = this.getRange();
+    if (!range) return false;
+
+    if (matchPattern.type === 'tagName') {
+      const tagName = matchPattern.value;
+      const startContainer = range.startContainer;
+      let node = startContainer;
+      let tagNameChain = []; // 点击位置往上搜集的节点标签名链
+      
+      while((node = node.parentNode) && node.tagName !== 'P') {
+        tagNameChain.push(node.tagName);
+      }
+
+      if (typeof tagName === 'string') {
+        return tagNameChain.indexOf(tagName) > -1
+      } else {
+        let isSelected = tagName.some(item => {
+          return tagNameChain.indexOf(item) > -1;
+        })
+        return isSelected
+      }
+    }
+    return false;
   }
 }
 
