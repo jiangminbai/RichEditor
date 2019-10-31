@@ -2,20 +2,61 @@
  * 文本居中
  */
 
-import AbstractToolbar from '../core/abstractToolbar';
+// import AbstractToolbar from '../core/abstractToolbar';
 
-class JustifyCenter extends AbstractToolbar {
-  constructor() {
-    super();
-    // this.tagName = ''
+// class JustifyCenter extends AbstractToolbar {
+//   constructor() {
+//     super();
+//     // this.tagName = ''
+//   }
+
+//   create() {
+//     this.el.innerHTML= this.svgs["align-center"];
+//   }
+
+//   clicked() {
+//     document.execCommand('justifyCenter');
+//   }
+// }
+
+// export default JustifyCenter;
+
+/**
+ * 粗体
+ */
+import RichEditor from '../core/richEditor';
+import Editor from '../core/editor';
+import Button from '../controls/button';
+
+class JustifyCenter {
+  editor: Editor;
+  button: Button;
+
+  install(context: RichEditor) {
+    const { editor, svgs, toolbar, control } = context;
+    this.editor = editor;
+
+    const Button = control.require('button');
+    this.button = new Button(toolbar.el);
+    this.button.setIcon(svgs["align-center"]);
+
+    this.button.on('click', this.onClick.bind(this));
+    editor.on('rangechange', this.onRangeChange.bind(this));
   }
 
-  create() {
-    this.el.innerHTML= this.svgs["align-center"];
+  onClick(){
+    this.editor.restoreSelection();
+    document.execCommand('JustifyCenter');
   }
 
-  clicked() {
-    document.execCommand('justifyCenter');
+  onRangeChange() {
+    const isMatch = this.editor.match({
+      type: 'style',
+      value: {
+        textAlign: 'center'
+      }
+    })
+    isMatch ? this.button.setActive() : this.button.resetActive();
   }
 }
 

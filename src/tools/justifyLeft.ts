@@ -2,20 +2,61 @@
  * 文本居左
  */
 
-import AbstractToolbar from '../core/abstractToolbar';
+// import AbstractToolbar from '../core/abstractToolbar';
 
-class JustifyLeft extends AbstractToolbar {
-  constructor() {
-    super();
-    // this.tagName = ''
+// class JustifyLeft extends AbstractToolbar {
+//   constructor() {
+//     super();
+//     // this.tagName = ''
+//   }
+
+//   create() {
+//     this.el.innerHTML = this.svgs["align-left"];
+//   }
+
+//   clicked() {
+//     document.execCommand('justifyLeft');
+//   }
+// }
+
+// export default JustifyLeft;
+
+/**
+ * 粗体
+ */
+import RichEditor from '../core/richEditor';
+import Editor from '../core/editor';
+import Button from '../controls/button';
+
+class JustifyLeft {
+  editor: Editor;
+  button: Button;
+
+  install(context: RichEditor) {
+    const { editor, svgs, toolbar, control } = context;
+    this.editor = editor;
+
+    const Button = control.require('button');
+    this.button = new Button(toolbar.el);
+    this.button.setIcon(svgs["align-left"]);
+
+    this.button.on('click', this.onClick.bind(this));
+    editor.on('rangechange', this.onRangeChange.bind(this));
   }
 
-  create() {
-    this.el.innerHTML = this.svgs["align-left"];
+  onClick(){
+    this.editor.restoreSelection();
+    document.execCommand('JustifyLeft');
   }
 
-  clicked() {
-    document.execCommand('justifyLeft');
+  onRangeChange() {
+    const isMatch = this.editor.match({
+      type: 'style',
+      value: {
+        textAlign: 'left'
+      }
+    })
+    isMatch ? this.button.setActive() : this.button.resetActive();
   }
 }
 

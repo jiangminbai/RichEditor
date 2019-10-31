@@ -80,25 +80,31 @@ class Editor extends Emitter {
   match(matchPattern: MatchPattern): boolean {
     const range = this.getRange();
     if (!range) return false;
+    
+    // 获取节点链
+    const startContainer = range.startContainer;
+    let node = startContainer;
+    let nodeChain = []; // 点击位置往上搜集的节点链
+    while(!node.classList.contains('richeditor_area')) {
+      if (node.tagName) nodeChain.push(node); // 排除text节点
+      node = node.parentNode
+    }
 
+    const value = matchPattern.value;
     if (matchPattern.type === 'tagName') {
-      const tagName = matchPattern.value;
-      const startContainer = range.startContainer;
-      let node = startContainer;
-      let tagNameChain = []; // 点击位置往上搜集的节点标签名链
-      
-      while((node = node.parentNode) && node.tagName !== 'P') {
-        tagNameChain.push(node.tagName);
-      }
-
-      if (typeof tagName === 'string') {
-        return tagNameChain.indexOf(tagName) > -1
+      if (typeof value === 'string') {
+        // return nodeChain.indexOf(value) > -1
+        return nodeChain.some(node => node.tagName === value);
       } else {
-        let isSelected = tagName.some(item => {
-          return tagNameChain.indexOf(item) > -1;
+        return value.some(name => {
+          // return nodeChain.indexOf(item) > -1;
+          return nodeChain.some(node => node.tagName === name);
         })
-        return isSelected
       }
+    } else if (matchPattern.type === 'style') {
+      return Object.keys(value).some(key => {
+        return nodeChain.some(node => node.style[key] === value[key]);
+      })
     }
     return false;
   }

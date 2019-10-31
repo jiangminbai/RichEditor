@@ -50,18 +50,18 @@ class Toolbar {
         name: 'unordered-list',
         module: new UnorderedList()
       },
-      // {
-      //   name: 'justify-left',
-      //   module: new JustifyLeft()
-      // },
-      // {
-      //   name: 'justify-center',
-      //   module: new JustifyCenter()
-      // },
-      // {
-      //   name: 'justify-right',
-      //   module: new JustifyRight()
-      // },
+      {
+        name: 'justify-left',
+        module: new JustifyLeft()
+      },
+      {
+        name: 'justify-center',
+        module: new JustifyCenter()
+      },
+      {
+        name: 'justify-right',
+        module: new JustifyRight()
+      },
     ]
 
     plugins.forEach(plugin => {
