@@ -1,29 +1,6 @@
 /**
  * 文本居左
  */
-
-// import AbstractToolbar from '../core/abstractToolbar';
-
-// class JustifyLeft extends AbstractToolbar {
-//   constructor() {
-//     super();
-//     // this.tagName = ''
-//   }
-
-//   create() {
-//     this.el.innerHTML = this.svgs["align-left"];
-//   }
-
-//   clicked() {
-//     document.execCommand('justifyLeft');
-//   }
-// }
-
-// export default JustifyLeft;
-
-/**
- * 粗体
- */
 import RichEditor from '../core/richEditor';
 import Editor from '../core/editor';
 import Button from '../controls/button';

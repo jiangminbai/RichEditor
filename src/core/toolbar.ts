@@ -4,6 +4,8 @@
 
 import registry from './registry';
 import RichEditor from './richEditor';
+import Undo from '../tools/undo';
+import Redo from '../tools/redo';
 import Bold from '../tools/bold';
 import Italic from '../tools/italic';
 import Underline from '../tools/underline';
@@ -26,6 +28,14 @@ class Toolbar {
   // 注册插件列表
   registerPlugins(editor: RichEditor) {
     const plugins = [
+      {
+        name: 'undo',
+        module: new Undo()
+      },
+      {
+        name: 'redo',
+        module: new Redo()
+      },
       {
         name: 'bold',
         module: new Bold()
