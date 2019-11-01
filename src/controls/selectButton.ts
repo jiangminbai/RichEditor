@@ -1,11 +1,17 @@
 /**
  * 选择按钮
+ * @param
+ * container: HTMLELEMENT
+ * @method
+ * setText(text: string): void;
+ * @event
+ * click  e, isShow: boolean, coordinate: Coordinate
  */
 import Emitter from '../core/emitter';
 import svgs from '../core/svgs';
 
 class SelectButton extends Emitter {
-  el: HTMLElement;
+  private el: HTMLElement;
   private textSpan: HTMLElement;
   private icon: HTMLElement;
   private clickCount: number = 0;

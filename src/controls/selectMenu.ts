@@ -1,5 +1,13 @@
 /**
  * 选择菜单
+ * @param
+ * list: Item[]
+ * first: boolean
+ * @method
+ * show(coordinate: Coordinate): void;
+ * hide(): void;
+ * @event
+ * itemClick item:Item
  */
 import Emitter from '../core/emitter';
 
@@ -16,8 +24,8 @@ interface Item {
 }
 
 class SelectMenu extends Emitter {
-  el: HTMLElement;
-  list: Item[]
+  private el: HTMLElement;
+  private list: Item[]
 
   constructor(list: Item[], first: boolean) {
     super();

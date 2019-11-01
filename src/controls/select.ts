@@ -1,5 +1,11 @@
 /**
  * 选择器
+ * @param
+ * container: HTMLELEMENT
+ * list: Item[]
+ * @method
+ * @event
+ * itemClick selectText:string
  */
 
 import Emitter from '../core/emitter';
@@ -12,8 +18,8 @@ interface Item {
 }
 
 class Select extends Emitter {
-  selectButton: SelectButton;
-  selectMenu: SelectMenu;
+  private selectButton: SelectButton;
+  private selectMenu: SelectMenu;
 
   constructor(container: HTMLElement, list: Item[]) {
     super();
