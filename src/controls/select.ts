@@ -25,9 +25,7 @@ class Select extends Emitter {
     super();
 
     this.selectButton = new SelectButton(container);
-    this.selectButton.setText(list[0].label);
     this.selectMenu = new SelectMenu(list);
-    this.selectMenu.setActive(0);
     this.selectMenu.inside = (e) => {
       return this.selectButton.el.contains(e.target) || this.selectButton === e.target;
     }
@@ -49,8 +47,8 @@ class Select extends Emitter {
     })
   }
 
-  public setValue(item: Item) {
-    this.selectButton.setText(item.label);
+  public setValue(text: string) {
+    this.selectButton.setText(text);
   }
 }
 

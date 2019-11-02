@@ -163,9 +163,7 @@ class Select extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor(container, list) {
         super();
         this.selectButton = new _selectButton__WEBPACK_IMPORTED_MODULE_1__["default"](container);
-        this.selectButton.setText(list[0].label);
         this.selectMenu = new _selectMenu__WEBPACK_IMPORTED_MODULE_2__["default"](list);
-        this.selectMenu.setActive(0);
         this.selectMenu.inside = (e) => {
             return this.selectButton.el.contains(e.target) || this.selectButton === e.target;
         };
@@ -185,8 +183,8 @@ class Select extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
             this.selectMenu.hide();
         });
     }
-    setValue(item) {
-        this.selectButton.setText(item.label);
+    setValue(text) {
+        this.selectButton.setText(text);
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Select);
@@ -965,6 +963,7 @@ class FontSize {
         ];
         const Select = control.require('select');
         this.select = new Select(toolbar.el, this.options);
+        this.select.setValue('字号');
         this.select.on('itemClick', this.onClick.bind(this));
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
@@ -981,7 +980,7 @@ class FontSize {
         });
         if (size) {
             const item = this.options.find(it => it.value === size);
-            this.select.setValue(item);
+            this.select.setValue(item.label);
         }
     }
 }

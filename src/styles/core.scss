@@ -5,6 +5,9 @@
 }
 .richeditor_toolbar {
   height: 28px;
+  border: 1px solid #9E9E9E;
+  border-bottom: none;
+  padding-top: 5px;
 }
 .richeditor_toolbarItem {
   display: block;
@@ -24,7 +27,6 @@
 }
 .richeditor_area {
   height: calc(100% - 28px);
-  width: 100%;
-  border: 1px solid #ccc;
+  border: 1px solid #9e9e9e;
   outline: none;
 }

@@ -29,6 +29,7 @@ class FontSize {
 
     const Select = control.require('select');
     this.select = new Select(toolbar.el, this.options);
+    this.select.setValue('字号')
     this.select.on('itemClick', this.onClick.bind(this));
 
     editor.on('rangechange', this.onRangeChange.bind(this));
@@ -48,7 +49,7 @@ class FontSize {
     })
     if (size) {
       const item = this.options.find(it => it.value === size);
-      this.select.setValue(item);
+      this.select.setValue(item.label);
     }
   }
 }
