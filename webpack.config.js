@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 // webpack配置对象
 const webpackConfig = {
-  // mode: 'development',
+  mode: 'development',
   entry: {
     'richEditor.js': './src/core/richEditor.ts',
     'rich-editor': './src/styles/rich-editor.scss'
@@ -33,26 +33,28 @@ const webpackConfig = {
   devtool: 'source-map'
 }
 
-// 编译器
-const compiler = webpack(webpackConfig);
+module.exports = webpackConfig;
 
-// 运行编译器
-compiler.run((err, stats) => {
-  if (err) {
-    console.error(err.stack || err);
-    if (err.details) {
-      console.error(err.details);
-    }
-    return;
-  }
+// // 编译器
+// const compiler = webpack(webpackConfig);
 
-  const info = stats.toJson();
+// // 运行编译器
+// compiler.run((err, stats) => {
+//   if (err) {
+//     console.error(err.stack || err);
+//     if (err.details) {
+//       console.error(err.details);
+//     }
+//     return;
+//   }
 
-  if (stats.hasErrors()) {
-    console.error(info.errors);
-  }
+//   const info = stats.toJson();
 
-  console.log(stats.toString({
-    colors: true    // 在控制台展示颜色
-  }));
-})
+//   if (stats.hasErrors()) {
+//     console.error(info.errors);
+//   }
+
+//   console.log(stats.toString({
+//     colors: true    // 在控制台展示颜色
+//   }));
+// })

@@ -11,19 +11,21 @@ import Emitter from '../core/emitter';
 import svgs from '../core/svgs';
 
 class SelectButton extends Emitter {
-  private el: HTMLElement;
+  public el: HTMLElement;
   private textSpan: HTMLElement;
   private icon: HTMLElement;
-  private clickCount: number = 0;
 
   constructor(container: HTMLElement) {
     super();
     this.el = document.createElement('div');
-    this.el.className = 'richeditor_toolbarItem';
-    container.appendChild(this.el);
-
     this.textSpan = document.createElement('div');
     this.icon = document.createElement('div');
+
+    this.el.className = 'richeditor_toolbarItem rd_select-btn';
+    this.textSpan.className = 'rd_select-btn-text';
+    this.icon.className = 'rd_select-btn-icon';
+
+    container.appendChild(this.el);
     this.el.appendChild(this.textSpan);
     this.el.appendChild(this.icon);
 
@@ -31,9 +33,7 @@ class SelectButton extends Emitter {
 
     this.el.addEventListener('click', (e) => {
       var coordinate = this.el.getBoundingClientRect();
-      this.clickCount++;
-      const isShow = !!(this.clickCount % 2);
-      this.fire('click', e, isShow, coordinate);
+      this.fire('click', e, coordinate, this.textSpan.textContent);
     })
   }
 

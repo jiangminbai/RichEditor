@@ -1,3 +1,69 @@
-a{text-decoration:none}
+.richeditor {
+  width: 600px;
+  height: 400px;
+  font-size: 14px;
+}
+
+.richeditor_toolbar {
+  height: 28px;
+}
+
+.richeditor_toolbarItem {
+  display: block;
+  float: left;
+  height: 24px;
+  cursor: pointer;
+  box-sizing: border-box;
+  margin: 0 2px;
+}
+.richeditor_toolbarItem:hover > svg {
+  fill: #FF9800;
+}
+.richeditor_toolbarItem.active > svg {
+  fill: #F44336;
+}
+
+.richeditor_area {
+  height: calc(100% - 28px);
+  width: 100%;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.rd_select-btn {
+  display: flex;
+  border: 2px solid #000;
+  width: 90px;
+}
+.rd_select-btn .rd_select-btn-text {
+  flex: 1;
+  text-align: center;
+}
+.rd_select-btn .rd_select-btn-icon {
+  display: inline-block;
+  width: 18px;
+  text-align: center;
+}
+
+.rd_select-menu {
+  position: absolute;
+  font-size: 14px;
+  border: 2px solid #000;
+}
+.rd_select-menu ul, .rd_select-menu li {
+  margin: 0;
+  padding: 0;
+}
+.rd_select-menu li {
+  list-style: none;
+}
+.rd_select-menu li {
+  padding: 5px 12px;
+  cursor: pointer;
+}
+.rd_select-menu li:hover, .rd_select-menu li.active {
+  background: #F44336;
+  color: #fff;
+}
 
 /*# sourceMappingURL=rich-editor.css.map*/

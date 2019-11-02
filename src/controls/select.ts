@@ -26,19 +26,26 @@ class Select extends Emitter {
 
     this.selectButton = new SelectButton(container);
     this.selectButton.setText(list[0].label);
-    this.selectMenu = new SelectMenu(list, true);
+    this.selectMenu = new SelectMenu(list);
+    this.selectMenu.setActive(0);
+    this.selectMenu.inside = (e) => {
+      return this.selectButton.el.contains(e.target) || this.selectButton === e.target;
+    }
 
-    this.selectButton.on('click', (e, isShow, coordinate) => {
-      if (isShow) {
+    this.selectButton.on('click', (e, coordinate, label) => {
+      if (!this.selectMenu.isShow) {
+        const index = list.findIndex(item => item.label === label);
+        this.selectMenu.setActive(index);
         this.selectMenu.show(coordinate);
       } else {
         this.selectMenu.hide();
       }
     })
 
-    this.selectMenu.on('itemClick', (selectText) => {
-      this.selectButton.setText(selectText);
-      this.fire('itemClick', selectText);
+    this.selectMenu.on('itemClick', (item) => {
+      this.selectButton.setText(item.label);
+      this.fire('itemClick', item);
+      this.selectMenu.hide();
     })
   }
 }

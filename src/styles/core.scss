@@ -1,0 +1,30 @@
+.richeditor {
+  width: 600px;
+  height: 400px;
+  font-size: 14px;
+}
+.richeditor_toolbar {
+  height: 28px;
+}
+.richeditor_toolbarItem {
+  display: block;
+  float: left;
+  height: 24px;
+  cursor: pointer;
+  box-sizing: border-box;
+  margin: 0 2px;
+
+  &:hover > svg {
+    fill: #FF9800;
+  }
+
+  &.active > svg {
+    fill: #F44336;
+  }
+}
+.richeditor_area {
+  height: calc(100% - 28px);
+  width: 100%;
+  border: 1px solid #ccc;
+  outline: none;
+}

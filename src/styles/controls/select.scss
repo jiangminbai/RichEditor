@@ -1,0 +1,41 @@
+.rd_select-btn {
+  display: flex;
+  border: 2px solid #000;
+  width: 90px;
+
+  .rd_select-btn-text {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .rd_select-btn-icon {
+    display: inline-block;
+    width: 18px;
+    text-align: center;
+  }
+}
+
+.rd_select-menu {
+  position: absolute;
+  font-size: 14px;
+  border: 2px solid #000;
+
+  ul, li {
+    margin: 0;
+    padding: 0;
+  }
+  
+  li {
+    list-style: none;
+  }
+
+  li {
+    padding: 5px 12px;
+    cursor: pointer;
+
+    &:hover, &.active {
+      background: #F44336;
+      color: #fff;
+    }
+  }
+}
