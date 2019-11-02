@@ -11,12 +11,13 @@ import Select from '../controls/select';
 class FontSize {
   editor: Editor;
   select: Select;
+  options: any;
   
 
   install(context: RichEditor) {
     const { editor, svgs, toolbar, control } = context;
     this.editor = editor;
-    const options = [
+    this.options = [
       { label: 'x-small', value: '1' },
       { label: 'small', value: '2' },
       { label: 'medium', value: '3' },
@@ -27,9 +28,9 @@ class FontSize {
     ]
 
     const Select = control.require('select');
-    this.select = new Select(toolbar.el, options);
-
+    this.select = new Select(toolbar.el, this.options);
     this.select.on('itemClick', this.onClick.bind(this));
+
     editor.on('rangechange', this.onRangeChange.bind(this));
   }
 
@@ -39,10 +40,16 @@ class FontSize {
   }
 
   onRangeChange() {
-    const isMatch = this.editor.match({
-      type: 'tagName',
-      value: 'B'
+    const size = this.editor.match({
+      type: 'tagNameAttribute',
+      tagName: 'FONT',
+      attribute: 'size',
+      value: ['1', '2', '3', '4', '5', '6', '7']
     })
+    if (size) {
+      const item = this.options.find(it => it.value === size);
+      this.select.setValue(item);
+    }
   }
 }
 

@@ -48,6 +48,10 @@ class Select extends Emitter {
       this.selectMenu.hide();
     })
   }
+
+  public setValue(item: Item) {
+    this.selectButton.setText(item.label);
+  }
 }
 
 export default Select;

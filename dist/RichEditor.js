@@ -185,6 +185,9 @@ class Select extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
             this.selectMenu.hide();
         });
     }
+    setValue(item) {
+        this.selectButton.setText(item.label);
+    }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Select);
 
@@ -455,22 +458,31 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
             node = node.parentNode;
         }
         const value = matchPattern.value;
+        // value: string | array
         if (matchPattern.type === 'tagName') {
             if (typeof value === 'string') {
-                // return nodeChain.indexOf(value) > -1
                 return nodeChain.some(node => node.tagName === value);
             }
             else {
                 return value.some(name => {
-                    // return nodeChain.indexOf(item) > -1;
                     return nodeChain.some(node => node.tagName === name);
                 });
             }
+            // value: object
         }
         else if (matchPattern.type === 'style') {
             return Object.keys(value).some(key => {
                 return nodeChain.some(node => node.style[key] === value[key]);
             });
+            // value: object
+        }
+        else if (matchPattern.type === 'tagNameAttribute') {
+            const node = nodeChain.find(node => node.tagName === matchPattern.tagName);
+            if (!node)
+                return null;
+            let attrValAttr = (typeof matchPattern.value === 'string') ? [matchPattern.value] : matchPattern.value;
+            let value = attrValAttr.find(val => node.getAttribute(matchPattern.attribute) === val);
+            return value;
         }
         return false;
     }
@@ -942,7 +954,7 @@ class FontSize {
     install(context) {
         const { editor, svgs, toolbar, control } = context;
         this.editor = editor;
-        const options = [
+        this.options = [
             { label: 'x-small', value: '1' },
             { label: 'small', value: '2' },
             { label: 'medium', value: '3' },
@@ -952,7 +964,7 @@ class FontSize {
             { label: 'xxx-large', value: '7' },
         ];
         const Select = control.require('select');
-        this.select = new Select(toolbar.el, options);
+        this.select = new Select(toolbar.el, this.options);
         this.select.on('itemClick', this.onClick.bind(this));
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
@@ -961,10 +973,16 @@ class FontSize {
         document.execCommand('fontSize', false, item.value);
     }
     onRangeChange() {
-        const isMatch = this.editor.match({
-            type: 'tagName',
-            value: 'B'
+        const size = this.editor.match({
+            type: 'tagNameAttribute',
+            tagName: 'FONT',
+            attribute: 'size',
+            value: ['1', '2', '3', '4', '5', '6', '7']
         });
+        if (size) {
+            const item = this.options.find(it => it.value === size);
+            this.select.setValue(item);
+        }
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (FontSize);

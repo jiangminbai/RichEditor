@@ -4,8 +4,10 @@
 import Emitter from './emitter';
 
 interface MatchPattern {
-  type: string, // 可选值'tagName' | 'style' 
-  value: any // type为‘tagname’时，value为string；type为‘style’时，value为对象
+  type: string, // 可选值'tagName' | 'style' | 'tagNameAttribute',
+  tagName?: string, // 'tagNameAttribute'
+  attribute?: string | string[], // 'tagNameAttribute'
+  value: any  // type为‘tagname’时，value为string；type为‘style’时，value为对象
 }
 
 class Editor extends Emitter {
@@ -91,20 +93,27 @@ class Editor extends Emitter {
     }
 
     const value = matchPattern.value;
+    // value: string | array
     if (matchPattern.type === 'tagName') {
       if (typeof value === 'string') {
-        // return nodeChain.indexOf(value) > -1
         return nodeChain.some(node => node.tagName === value);
       } else {
         return value.some(name => {
-          // return nodeChain.indexOf(item) > -1;
           return nodeChain.some(node => node.tagName === name);
         })
       }
+    // value: object
     } else if (matchPattern.type === 'style') {
       return Object.keys(value).some(key => {
         return nodeChain.some(node => node.style[key] === value[key]);
       })
+    // value: object
+    } else if (matchPattern.type === 'tagNameAttribute') {
+      const node = nodeChain.find(node => node.tagName === matchPattern.tagName);
+      if (!node) return null;
+      let attrValAttr = (typeof matchPattern.value === 'string') ? [matchPattern.value] : matchPattern.value;
+      let value = attrValAttr.find(val => node.getAttribute(matchPattern.attribute) === val);
+      return value;
     }
     return false;
   }
