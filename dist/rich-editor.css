@@ -37,6 +37,9 @@
   border: 2px solid #000;
   width: 90px;
 }
+.rd_select-btn.rd_select-ft-btn {
+  width: 109px;
+}
 .rd_select-btn .rd_select-btn-text {
   flex: 1;
   text-align: center;
@@ -51,7 +54,6 @@
   position: absolute;
   font-size: 14px;
   border: 2px solid #000;
-  border-top: none;
   background: #fff;
 }
 .rd_select-menu ul, .rd_select-menu li {

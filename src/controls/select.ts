@@ -50,6 +50,10 @@ class Select extends Emitter {
   public setValue(text: string) {
     this.selectButton.setText(text);
   }
+
+  public setCustomClass(style: string) {
+    this.selectButton.el.classList.add(style);
+  }
 }
 
 export default Select;

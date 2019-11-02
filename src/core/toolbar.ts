@@ -16,6 +16,7 @@ import JustifyRight from '../tools/justifyRight';
 import OrderedList from '../tools/orderedList';
 import UnorderedList from '../tools/unorderedList';
 import FontSize from '../tools/fontsize';
+import FontName from '../tools/fontname';
 
 class Toolbar {
   el: HTMLElement;
@@ -76,12 +77,15 @@ class Toolbar {
       {
         name: 'fontsize',
         module: new FontSize()
+      },
+      {
+        name: 'fontname',
+        module: new FontName()
       }
     ]
 
     plugins.forEach(plugin => {
       this.register(plugin.name, plugin.module);
-      // this.el.appendChild(plugin.module.el);
       if (plugin.module.install) plugin.module.install(editor);
     })
   }

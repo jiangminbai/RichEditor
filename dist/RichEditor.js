@@ -186,6 +186,9 @@ class Select extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
     setValue(text) {
         this.selectButton.setText(text);
     }
+    setCustomClass(style) {
+        this.selectButton.el.classList.add(style);
+    }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Select);
 
@@ -810,9 +813,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tools_orderedList__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../tools/orderedList */ "./src/tools/orderedList.ts");
 /* harmony import */ var _tools_unorderedList__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../tools/unorderedList */ "./src/tools/unorderedList.ts");
 /* harmony import */ var _tools_fontsize__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../tools/fontsize */ "./src/tools/fontsize.ts");
+/* harmony import */ var _tools_fontname__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../tools/fontname */ "./src/tools/fontname.ts");
 /**
  * 工具栏类
  */
+
 
 
 
@@ -882,11 +887,14 @@ class Toolbar {
             {
                 name: 'fontsize',
                 module: new _tools_fontsize__WEBPACK_IMPORTED_MODULE_12__["default"]()
+            },
+            {
+                name: 'fontname',
+                module: new _tools_fontname__WEBPACK_IMPORTED_MODULE_13__["default"]()
             }
         ];
         plugins.forEach(plugin => {
             this.register(plugin.name, plugin.module);
-            // this.el.appendChild(plugin.module.el);
             if (plugin.module.install)
                 plugin.module.install(editor);
         });
@@ -939,6 +947,63 @@ class Bold {
 
 /***/ }),
 
+/***/ "./src/tools/fontname.ts":
+/*!*******************************!*\
+  !*** ./src/tools/fontname.ts ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class FontName {
+    install(context) {
+        const { editor, svgs, toolbar, control } = context;
+        this.editor = editor;
+        this.options = [
+            { label: '微软雅黑', value: 'Microsoft-YaHei' },
+            { label: '仿宋', value: 'FangSong' },
+            { label: '楷体', value: 'KaiTi' },
+            { label: '宋体', value: 'SimSun' },
+            { label: '黑体', value: 'SimHei' },
+            { label: 'Arial', value: 'arial' },
+            { label: 'Courier New', value: 'courier new' },
+            { label: 'Helvetica', value: 'helvetica' },
+            { label: 'sans-serif', value: 'sans-serif' },
+        ];
+        const Select = control.require('select');
+        this.select = new Select(toolbar.el, this.options);
+        this.select.setCustomClass('rd_select-ft-btn');
+        this.select.setValue('字体');
+        this.select.on('itemClick', this.onClick.bind(this));
+        editor.on('rangechange', this.onRangeChange.bind(this));
+    }
+    onClick(item) {
+        this.editor.restoreSelection();
+        document.execCommand('fontName', false, item.value);
+    }
+    onRangeChange() {
+        var values = this.options.map(item => item.value);
+        const size = this.editor.match({
+            type: 'tagNameAttribute',
+            tagName: 'FONT',
+            attribute: 'face',
+            value: values
+        });
+        if (size) {
+            const item = this.options.find(it => it.value === size);
+            this.select.setValue(item.label);
+        }
+        else {
+            this.select.setValue('字体');
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (FontName);
+
+
+/***/ }),
+
 /***/ "./src/tools/fontsize.ts":
 /*!*******************************!*\
   !*** ./src/tools/fontsize.ts ***!
@@ -981,6 +1046,9 @@ class FontSize {
         if (size) {
             const item = this.options.find(it => it.value === size);
             this.select.setValue(item.label);
+        }
+        else {
+            this.select.setValue('字号');
         }
     }
 }

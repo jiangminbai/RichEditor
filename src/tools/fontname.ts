@@ -8,7 +8,7 @@ import RichEditor from '../core/richEditor';
 import Editor from '../core/editor';
 import Select from '../controls/select';
 
-class FontSize {
+class FontName {
   editor: Editor;
   select: Select;
   options: any;
@@ -18,18 +18,21 @@ class FontSize {
     const { editor, svgs, toolbar, control } = context;
     this.editor = editor;
     this.options = [
-      { label: 'x-small', value: '1' },
-      { label: 'small', value: '2' },
-      { label: 'medium', value: '3' },
-      { label: 'large', value: '4' },
-      { label: 'x-large', value: '5' },
-      { label: 'xx-large', value: '6' },
-      { label: 'xxx-large', value: '7' },
+      { label: '微软雅黑', value: 'Microsoft-YaHei' },
+      { label: '仿宋', value: 'FangSong' },
+      { label: '楷体', value: 'KaiTi' },
+      { label: '宋体', value: 'SimSun' },
+      { label: '黑体', value: 'SimHei' },
+      { label: 'Arial', value: 'arial' },
+      { label: 'Courier New', value: 'courier new' },
+      { label: 'Helvetica', value: 'helvetica' },
+      { label: 'sans-serif', value: 'sans-serif' },
     ]
 
     const Select = control.require('select');
     this.select = new Select(toolbar.el, this.options);
-    this.select.setValue('字号')
+    this.select.setCustomClass('rd_select-ft-btn');
+    this.select.setValue('字体');
     this.select.on('itemClick', this.onClick.bind(this));
 
     editor.on('rangechange', this.onRangeChange.bind(this));
@@ -37,23 +40,24 @@ class FontSize {
 
   onClick(item){
     this.editor.restoreSelection();
-    document.execCommand('fontSize', false, item.value);
+    document.execCommand('fontName', false, item.value);
   }
 
   onRangeChange() {
+    var values = this.options.map(item => item.value);
     const size = this.editor.match({
       type: 'tagNameAttribute',
       tagName: 'FONT',
-      attribute: 'size',
-      value: ['1', '2', '3', '4', '5', '6', '7']
+      attribute: 'face',
+      value: values
     })
     if (size) {
       const item = this.options.find(it => it.value === size);
       this.select.setValue(item.label);
     } else {
-      this.select.setValue('字号');
+      this.select.setValue('字体');
     }
   }
 }
 
-export default FontSize;
+export default FontName;
