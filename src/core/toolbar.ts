@@ -15,6 +15,7 @@ import JustifyCenter from '../tools/justifyCenter';
 import JustifyRight from '../tools/justifyRight';
 import OrderedList from '../tools/orderedList';
 import UnorderedList from '../tools/unorderedList';
+import FontSize from '../tools/fontsize';
 
 class Toolbar {
   el: HTMLElement;
@@ -72,6 +73,10 @@ class Toolbar {
         name: 'justify-right',
         module: new JustifyRight()
       },
+      {
+        name: 'fontsize',
+        module: new FontSize()
+      }
     ]
 
     plugins.forEach(plugin => {

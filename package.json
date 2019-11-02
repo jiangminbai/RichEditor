@@ -2,7 +2,7 @@
   "name": "richeditor",
   "version": "1.0.0",
   "description": "a richer editor",
-  "main": "RickEditor.ts",
+  "main": "RickEditor",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,9 +21,15 @@
   },
   "homepage": "https://github.com/jan-wong/RichEditor#readme",
   "devDependencies": {
+    "css-loader": "^3.2.0",
+    "mini-css-extract-plugin": "^0.8.0",
+    "sass": "^1.23.3",
+    "sass-loader": "^8.0.0",
+    "style-loader": "^1.0.0",
     "ts-loader": "^6.2.0",
     "typescript": "^3.6.4",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9"
-  }
+  },
+  "dependencies": {}
 }
