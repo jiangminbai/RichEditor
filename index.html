@@ -13,7 +13,9 @@
 </div>
 <script src="./dist/richEditor.js"></script>
 <script>
-  new RichEditor({el: document.querySelector('.richeditor')});
+  var richEditor = new RichEditor({el: document.querySelector('.richeditor')});
+  const ColorPicker = richEditor.control.require('colorPicker');
+  new ColorPicker();
 </script>
 </body>
 </html>

@@ -135,6 +135,189 @@ class Button extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
+/***/ "./src/controls/colorPicker.ts":
+/*!*************************************!*\
+  !*** ./src/controls/colorPicker.ts ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_emitter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/emitter */ "./src/core/emitter.ts");
+
+// rgb字符串转化为对象
+function parseRGB(rgb) {
+    const rgbO = {};
+    const rgbA = rgb.match(/[0-9\.]+/g);
+    rgbO.r = rgbA[0];
+    rgbO.g = rgbA[1];
+    rgbO.b = rgbA[2];
+    rgbO.a = rgbA[3] || 1;
+    return rgbO;
+}
+// 调色板
+class Palette {
+    constructor(container, options) {
+        this.width = parseInt(options.width);
+        this.height = parseInt(options.height);
+        this.createElement(container, options);
+        this.render();
+        this.listenMouse();
+    }
+    // 创建基本元素
+    createElement(container, options) {
+        this.el = document.createElement('div');
+        this.el.className = 'rd_color-palette';
+        this.canvas = document.createElement('canvas');
+        this.canvas.style.width = options.width;
+        this.canvas.style.height = options.height;
+        this.canvas.setAttribute('width', options.width);
+        this.canvas.setAttribute('height', options.height);
+        this.canvasCtx = this.canvas.getContext('2d');
+        this.el.appendChild(this.canvas);
+        container.appendChild(this.el);
+    }
+    // 渲染
+    render(x = this.width, y = 0, hub) {
+        this.drawPalette(hub);
+        this.drawPicker(x, y);
+    }
+    /**
+     * 绘制调色板
+     * const rtRGB = 'rgb(255, 0, 0)'; // 右上角颜色（默认）
+     * const lrRGB = 'rgb(255, 255, 255)'; // 左上角颜色
+     * const lbRGB = 'rgb(0, 0, 0)'; // 左下角颜色
+     * const rbRGB = 'rgb(0, 0, 0)'; // 右下角颜色
+     */
+    drawPalette(hub) {
+        const w = this.width;
+        const h = this.height;
+        const piece = 255; // 总共多少份
+        const defaultRGB = hub || 'rgb(255, 0, 0)';
+        const { r, g, b } = parseRGB(defaultRGB);
+        for (let i = 0; i < piece + 1; i++) {
+            const xrgb = `rgb(${255 - (255 - r) * i / 255}, ${255 - (255 - g) * i / 255}, ${255 - (255 - b) * i / 255})`;
+            const x = w * i / 255;
+            const gradient = this.canvasCtx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, xrgb);
+            gradient.addColorStop(1, '#000');
+            this.canvasCtx.beginPath();
+            this.canvasCtx.fillStyle = gradient;
+            this.canvasCtx.rect(x, 0, x, h);
+            this.canvasCtx.fill();
+        }
+    }
+    // 绘制调色板拾取器
+    drawPicker(x, y) {
+        this.canvasCtx.beginPath();
+        this.canvasCtx.shadowColor = 'rgba(255,0,0,0.2)';
+        this.canvasCtx.shadowOffsetX = 1;
+        this.canvasCtx.shadowOffsetY = 1;
+        this.canvasCtx.strokeStyle = '#fff';
+        this.canvasCtx.arc(x, y, 6, 0, 2 * Math.PI);
+        this.canvasCtx.stroke();
+    }
+    listenMouse() {
+        const mouseMove = (e) => {
+            this.onMouseDM(e.layerX, e.layerY);
+        };
+        this.canvas.addEventListener('mousedown', (e) => {
+            this.onMouseDM(e.offsetX, e.offsetY);
+            this.canvas.addEventListener('mousemove', mouseMove);
+        });
+        this.canvas.addEventListener('mouseup', () => {
+            this.canvas.removeEventListener('mousemove', mouseMove);
+        });
+        this.canvas.addEventListener('mouseleave', () => {
+            this.canvas.removeEventListener('mousemove', mouseMove);
+        });
+    }
+    onMouseDM(x, y) {
+        this.canvasCtx.clearRect(0, 0, this.width, this.height);
+        this.render(x, y);
+    }
+}
+// 色相
+class Hub {
+    constructor(container) {
+        this.el = document.createElement('div');
+        this.el.className = 'rd_hub';
+        this.bar = document.createElement('div');
+        this.bar.className = 'rd_hub-bar';
+        this.btn = document.createElement('div');
+        this.btn.className = 'rd_hub-btn';
+        container.appendChild(this.el);
+        this.el.appendChild(this.bar);
+        this.bar.appendChild(this.btn);
+    }
+}
+// RGB
+class RGBControl {
+    constructor(container) {
+        this.el = document.createElement('div');
+        this.el.className = 'rd_rgb-control';
+        const html = `
+    <div class="rd_rgb-control-list">
+      <div class="rd_rgb-input">
+        <input type="text" />
+        <div class="rd_rgb-control-label">R</div>
+      </div>
+      <div class="rd_rgb-input">
+        <input type="text" />
+        <div class="rd_rgb-control-label">G</div>
+      </div>
+      <div class="rd_rgb-input">
+        <input type="text" />
+        <div class="rd_rgb-control-label">B</div>
+      </div>
+    </div>
+    `;
+        this.el.innerHTML = html;
+        container.appendChild(this.el);
+    }
+}
+// 颜色显示器
+class ColorDisplay {
+    constructor(container) {
+        this.el = document.createElement('div');
+        this.el.className = 'rd_color-display';
+        container.appendChild(this.el);
+    }
+    setBg(rgb) {
+        this.el.style.background = rgb;
+    }
+}
+// 颜色拾取器
+class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor() {
+        super();
+        this.el = document.createElement('div');
+        this.el.className = 'rd_color-picker';
+        this.palette = new Palette(this.el, { width: '180px', height: '125px' });
+        this.hub = new Hub(this.el);
+        this.box = document.createElement('div');
+        this.box.className = 'rd_box';
+        this.colorDisplay = new ColorDisplay(this.box);
+        this.rgbControl = new RGBControl(this.box);
+        this.el.appendChild(this.box);
+        // this.test()
+    }
+    open(e) {
+        const rect = e.target.getBoundingClientRect();
+        this.el.style.top = rect.bottom + 'px';
+        this.el.style.left = rect.left + 'px';
+        document.body.appendChild(this.el);
+    }
+    test() {
+        document.body.appendChild(this.el);
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (ColorPicker);
+
+
+/***/ }),
+
 /***/ "./src/controls/select.ts":
 /*!********************************!*\
   !*** ./src/controls/select.ts ***!
@@ -349,9 +532,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _controls_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../controls/select */ "./src/controls/select.ts");
 /* harmony import */ var _controls_selectButton__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../controls/selectButton */ "./src/controls/selectButton.ts");
 /* harmony import */ var _controls_selectMenu__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../controls/selectMenu */ "./src/controls/selectMenu.ts");
+/* harmony import */ var _controls_colorPicker__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../controls/colorPicker */ "./src/controls/colorPicker.ts");
 /**
  * 控件管理类
  */
+
 
 
 
@@ -363,6 +548,7 @@ class Control {
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('select', _controls_select__WEBPACK_IMPORTED_MODULE_2__["default"]);
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('selectButton', _controls_selectButton__WEBPACK_IMPORTED_MODULE_3__["default"]);
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('selectMenu', _controls_selectMenu__WEBPACK_IMPORTED_MODULE_4__["default"]);
+        _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('colorPicker', _controls_colorPicker__WEBPACK_IMPORTED_MODULE_5__["default"]);
     }
     register(name, control) {
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl(name, control);
