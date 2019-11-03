@@ -198,6 +198,49 @@ class ColorDisplay {
   }
 }
 
+// 颜色选择列表
+class ColorSelect {
+  el: HTMLElement;
+
+  constructor(container) {
+    this.el = document.createElement('div');
+    this.el.className = 'rd_color-select';
+    const colorList = this.getColor();
+    colorList.forEach(item => {
+      const span = document.createElement('span');
+      span.className = 'rd_color-select-item';
+      span.style.background = item;
+      this.el.appendChild(span);
+    })
+
+    container.appendChild(this.el);
+  }
+
+  private getColor() {
+    return [
+      'rgb(244, 67, 54)',
+      'rgb(233, 30, 99)',
+      'rgb(156, 39, 176)',
+      'rgb(103, 58, 183)',
+      'rgb(63, 81, 181)',
+      'rgb(33, 150, 243)',
+      'rgb(33, 150, 243)',
+      'rgb(0, 188, 212)',
+      'rgb(0, 150, 136)',
+      'rgb(76, 175, 80)',
+      'rgb(139, 195, 74)',
+      'rgb(205, 220, 57)',
+      'rgb(255, 235, 59)',
+      'rgb(255, 193, 7)',
+      'rgb(255, 152, 0)',
+      'rgb(255, 87, 34)',
+      'rgb(255, 87, 34)',
+      'rgb(158, 158, 158)',
+      // 'rgb(96, 125, 139)'
+    ]
+  }
+}
+
 // 颜色拾取器
 class ColorPicker extends Emitter {
   el: HTMLElement;
@@ -206,6 +249,7 @@ class ColorPicker extends Emitter {
   box: HTMLElement;
   colorDisplay: ColorDisplay;
   rgbControl: RGBControl;
+  colorSelect: ColorSelect;
 
   constructor() {
     super();
@@ -218,6 +262,7 @@ class ColorPicker extends Emitter {
     this.colorDisplay = new ColorDisplay(this.box);
     this.rgbControl = new RGBControl(this.box);
     this.el.appendChild(this.box);
+    this.colorSelect = new ColorSelect(this.el);
 
     // this.test()
   }

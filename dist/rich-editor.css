@@ -143,4 +143,22 @@
   font-size: 14px;
 }
 
+.rd_color-select {
+  width: 180px;
+  height: 50px;
+  padding-top: 10px;
+  border-top: 2px solid #000;
+  margin-top: 6px;
+}
+.rd_color-select .rd_color-select-item {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin: 0 3px;
+  cursor: pointer;
+}
+.rd_color-select .rd_color-select-item:hover {
+  transform: scale(1.1);
+}
+
 /*# sourceMappingURL=rich-editor.css.map*/
