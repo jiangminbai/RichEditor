@@ -15,7 +15,10 @@
   width: 100%;
   height: 100%;
   margin: 5px 0;
-  background: linear-gradient(to right,red,#ff0080,#f0f,#8000ff,#00f,#0080ff,#0ff,#00ff80,#0f0,#80ff00,#ff0,#ff8000,red);
+  cursor: pointer;
+  // background: linear-gradient(to right, red, blue, yellow, red); // 三环-其他环可以从此延伸
+  // background: linear-gradient(to right, rgb(255,0,0),rgb(255,0,255),rgb(0,0,255),rgb(0,255,255),rgb(0,255,0), rgb(255,255,0),rgb(255,0,0)); // 六环
+  background: linear-gradient(to right,rgb(255, 0, 0), rgb(255, 0, 128), rgb(255, 0, 255), rgb(128, 0, 255), rgb(0, 0, 255), rgb(0, 128, 255), rgb(0, 255, 255), rgb(0, 255, 128), rgb(0, 255, 0), rgb(128, 255, 0), rgb(255, 255, 0), rgb(255, 128, 0), rgb(255, 0, 0)); // 十二色相的色环-色彩设计的基础
 }
 
 .rd_hub-btn {
@@ -27,7 +30,7 @@
   box-sizing: content-box;
   height: 16px;
   width: 16px;
-  margin-right: -2px;
+  margin-right: -8px;
   margin-top: -2px;
   cursor: pointer;
 }

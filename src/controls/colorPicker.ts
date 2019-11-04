@@ -3,20 +3,28 @@
  * 领域知识：三种色彩模式
  * 1.RGB：通过组合红色(red)、绿色(green)、蓝色(blue)三种颜色通道的变化来表示颜色。取值范围0-255|0%-100%
  * 2.HEX：和RGB相同，不同的是取值范围00-FF
- * 3.HSL: 通过色相(hub)、饱和度(saturation)、明度(lightness)三种颜色通道的变化来表示变化。取值范围H(0-360)S(0-100%)L(0-100%)
- * 色相：颜色的值，0(或360)表示红色，120表示绿色，240表示蓝色
- * 饱和度：和掺入白色的量相关，掺入越少，越饱和。0 (透明)-100% (完全饱和)
+ * 3.HSV：通过色相(hub)、饱和度(saturation)、明度(lightness)三种颜色通道的变化来表示变化。
+ * H [0-360] S [0-1] V [0-1]
+ * 色相：在不同波长的光照射下，人眼所感觉不同的颜色。它是一个分段函数。通过三原色可以演变出形成6色环、12色环、24色环的色相环或色相条。
+ * 原色之间是线性变化的。
+ * 饱和度：和掺入白色的量相关，掺入越少，越饱和。
  * 明度：和掺入黑色的量相关，掺入越少，越明亮。
+ * 4.HSL: 通过色相(hub)、饱和度(saturation)、明度(lightness)三种颜色通道的变化来表示变化。
+ * H和HSV是一个意思，SL不是一个意思
+ * H [0-360] S [0-1] L [0-1]
  */
+
+ // 调色板构造函数参数
 interface PaletteOptions{
   width: string,
   height: string
 }
 
-// 坐标
-interface Point {
-  x: number,
-  y: number
+// 调色板render参数
+interface RenderOptions {
+  x?: number,
+  y?: number,
+  rgb?: string
 }
 
 import Emitter from '../core/emitter';
@@ -37,12 +45,19 @@ class Palette {
   el: HTMLElement;
   canvas: HTMLCanvasElement;
   canvasCtx: CanvasRenderingContext2D;
-  width: number;
-  height: number;
+  width: number; // 画布宽度
+  height: number; // 画布高度
+  x: number; // 选择器的x坐标
+  y: number; // 选择器y坐标
+  rgb: string; // 色相rgb默认值(右上角颜色)
 
   constructor(container: HTMLElement, options: PaletteOptions) {
     this.width = parseInt(options.width);
     this.height = parseInt(options.height);
+    this.x = this.width; // 默认值
+    this.y = 0; // 默认值
+    this.rgb = 'rgb(255, 0, 0)';
+
     this.createElement(container, options);
     this.render();
     this.listenMouse();
@@ -63,9 +78,13 @@ class Palette {
   }
 
   // 渲染
-  render(x: number = this.width, y: number = 0, hub?: string) {
-    this.drawPalette(hub);
-    this.drawPicker(x, y);
+  public render(renderOptions?: RenderOptions) {
+    if (renderOptions && renderOptions.x !== undefined) this.x = renderOptions.x;
+    if (renderOptions && renderOptions.y !== undefined) this.y = renderOptions.y;
+    if (renderOptions && renderOptions.rgb !== undefined) this.rgb = renderOptions.rgb;
+
+    this.drawPalette();
+    this.drawPicker();
   }
 
   /**
@@ -75,20 +94,22 @@ class Palette {
    * const lbRGB = 'rgb(0, 0, 0)'; // 左下角颜色
    * const rbRGB = 'rgb(0, 0, 0)'; // 右下角颜色
    */
-  drawPalette(hub?: string) {
+  private drawPalette() {
     const w = this.width;
     const h = this.height;
 
     const piece = 255; // 总共多少份
-    const defaultRGB = hub || 'rgb(255, 0, 0)';
+    const defaultRGB = this.rgb;
     const { r, g, b } = parseRGB(defaultRGB);
 
     for (let i = 0; i < piece + 1; i++) {
       const xrgb = `rgb(${255 - (255 - r) * i / 255}, ${255 - (255 - g) * i / 255}, ${ 255 - (255 - b) * i / 255})`;
       const x = w * i / 255;
+
       const gradient = this.canvasCtx.createLinearGradient(0, 0, 0, h);
       gradient.addColorStop(0, xrgb);
       gradient.addColorStop(1, '#000');
+
       this.canvasCtx.beginPath();
       this.canvasCtx.fillStyle = gradient;
       this.canvasCtx.rect(x,0,x,h);
@@ -96,18 +117,18 @@ class Palette {
     }
   }
 
-  // 绘制调色板拾取器
-  drawPicker(x: number, y: number) {
+  // 绘制调色板选择器
+  private drawPicker() {
     this.canvasCtx.beginPath();
     this.canvasCtx.shadowColor = 'rgba(255,0,0,0.2)';
     this.canvasCtx.shadowOffsetX = 1;
     this.canvasCtx.shadowOffsetY = 1;
     this.canvasCtx.strokeStyle = '#fff';
-    this.canvasCtx.arc(x, y, 6, 0, 2 * Math.PI);
+    this.canvasCtx.arc(this.x, this.y, 6, 0, 2 * Math.PI);
     this.canvasCtx.stroke();
   }
 
-  listenMouse() {
+  private listenMouse() {
     const mouseMove = (e) => {
       this.onMouseDM(e.layerX, e.layerY);
     }
@@ -123,19 +144,28 @@ class Palette {
     })
   }
 
-  onMouseDM(x: number, y: number) {
+  private onMouseDM(x: number, y: number) {
     this.canvasCtx.clearRect(0, 0, this.width, this.height);
-    this.render(x, y);
+    this.x = x;
+    this.y = y;
+    this.render();
   }
 }
 
 // 色相
-class Hub {
+class Hub extends Emitter {
   el: HTMLElement;
   bar: HTMLElement;
   btn: HTMLElement;
+  right: number = 0; // 滑动按钮距离滑动条右侧的距离
 
-  constructor(container) {
+  constructor(container: HTMLElement) {
+    super();
+    this.createElement(container);
+    this.dragBtn();
+  }
+
+  private createElement(container: HTMLElement) {
     this.el = document.createElement('div');
     this.el.className = 'rd_hub';
     this.bar = document.createElement('div');
@@ -145,6 +175,90 @@ class Hub {
     container.appendChild(this.el);
     this.el.appendChild(this.bar);
     this.bar.appendChild(this.btn);
+  }
+
+  private dragBtn() {
+    const onMouseMove = e => {
+      this.mousemoveBtn(e);
+    }
+    this.bar.addEventListener('mousedown', e => {
+      this.onMouseDownBar(e);
+    });
+    this.btn.addEventListener('mousedown', e => {
+      document.addEventListener('mousemove', onMouseMove)
+    })
+    document.addEventListener('mouseup', e => {
+      document.removeEventListener('mousemove', onMouseMove);
+    })
+    document.addEventListener('mouseleave', e => {
+      document.removeEventListener('mousemove', onMouseMove);
+    })
+  }
+
+  private onMouseDownBar(e) {
+    if (e.target == this.bar) {
+      const barWidth = this.bar.clientWidth;
+      const offsetX = e.offsetX;
+      this.btn.style.right = (barWidth - offsetX) + 'px';
+      this.right = parseInt(this.btn.style.right);
+      this.fire('change', this.getRGB());
+    }
+  }
+
+  private mousemoveBtn(e: MouseEvent) {
+    const barClientRect = this.bar.getBoundingClientRect();
+    if (e.clientX < barClientRect.left) {
+      this.btn.style.right = barClientRect.width + 'px';
+    } else if (e.clientX > barClientRect.right) {
+      this.btn.style.right = '0px';
+    } else {
+      this.btn.style.right = (barClientRect.right - e.clientX) + 'px';
+    }
+    this.right = parseInt(this.btn.style.right);
+    this.fire('change', this.getRGB());
+  }
+
+  // 计算色相条当前的rgb
+  public getRGB() {
+    // 12色相的色环
+    let hubSerial = [
+      [255, 0, 0],
+      [255, 0, 128],
+      [255, 0, 255],
+      [128, 0, 255],
+      [0, 0, 255],
+      [0, 128, 255],
+      [0, 255, 255],
+      [0, 255, 128],
+      [0, 255, 0],
+      [128, 255, 0],
+      [255, 255, 0],
+      [255, 128, 0],
+      [255, 0, 0],
+    ]
+    hubSerial = hubSerial.reverse(); // 倒置计算
+    const width = this.bar.clientWidth;
+    const right = this.right;
+    const pos = right/(width/12); // 分母
+    const pos1 = Math.floor(pos);
+    const pos2 = Math.ceil(pos);
+    let r, g, b;
+    if (pos1 !== pos2) {
+      r = Math.round((hubSerial[pos1][0] + hubSerial[pos2][0]) * (pos - pos1));
+      g = Math.round((hubSerial[pos1][1] + hubSerial[pos2][1]) * (pos - pos1));
+      b = Math.round((hubSerial[pos1][2] + hubSerial[pos2][2]) * (pos - pos1));
+    } else {
+      r = Math.round(hubSerial[pos1][0]);
+      g = Math.round(hubSerial[pos1][1]);
+      b = Math.round(hubSerial[pos1][2]);
+    }
+    
+    return {
+      value: `rgb(${r}, ${g}, ${b})`,
+      r,
+      g,
+      b
+    };
   }
 }
 
@@ -264,7 +378,11 @@ class ColorPicker extends Emitter {
     this.el.appendChild(this.box);
     this.colorSelect = new ColorSelect(this.el);
 
-    // this.test()
+    this.hub.on('change', rgb => {
+      this.palette.render({rgb: rgb.value});
+    })
+
+    this.test()
   }
 
   open(e: MouseEvent) {
@@ -280,4 +398,3 @@ class ColorPicker extends Emitter {
 }
 
 export default ColorPicker;
-
