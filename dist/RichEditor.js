@@ -523,7 +523,7 @@ class ColorSelect extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
 }
 // 颜色拾取器
 class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] {
-    constructor() {
+    constructor(e) {
         super();
         this.el = document.createElement('div');
         this.el.className = 'rd_color-picker';
@@ -542,6 +542,7 @@ class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
             this.hub.update(color.h);
             this.colorDisplay.update(color.value);
             this.rgbControl.updateRGB(color.r, color.g, color.b);
+            this.fire('change', color);
         });
         this.palette.on('h-change', color => {
             this.colorDisplay.update(color.value);
@@ -557,16 +558,14 @@ class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
         this.rgbControl.on('change', color => {
             this.palette.updateRGB(color.r, color.g, color.b);
         });
-        this.test();
-    }
-    open(e) {
         const rect = e.target.getBoundingClientRect();
         this.el.style.top = rect.bottom + 'px';
         this.el.style.left = rect.left + 'px';
         document.body.appendChild(this.el);
     }
-    test() {
-        document.body.appendChild(this.el);
+    update(rgb) {
+        const rgbO = rgb2object(rgb);
+        this.palette.updateRGB(rgbO.r, rgbO.g, rgbO.b);
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (ColorPicker);

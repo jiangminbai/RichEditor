@@ -484,7 +484,7 @@ class ColorPicker extends Emitter {
   rgbControl: RGBControl;
   colorSelect: ColorSelect;
 
-  constructor() {
+  constructor(e: MouseEvent) {
     super();
     this.el = document.createElement('div');
     this.el.className = 'rd_color-picker';
@@ -507,6 +507,7 @@ class ColorPicker extends Emitter {
       this.hub.update(color.h);
       this.colorDisplay.update(color.value);
       this.rgbControl.updateRGB(color.r, color.g, color.b);
+      this.fire('change', color);
     })
 
     this.palette.on('h-change', color => {
@@ -527,18 +528,15 @@ class ColorPicker extends Emitter {
       this.palette.updateRGB(color.r, color.g, color.b);
     })
 
-    this.test()
-  }
-
-  open(e: MouseEvent) {
     const rect = (<HTMLElement>e.target).getBoundingClientRect();
     this.el.style.top = rect.bottom + 'px';
     this.el.style.left = rect.left + 'px';
     document.body.appendChild(this.el);
   }
 
-  test() {
-    document.body.appendChild(this.el);
+  public update(rgb: string) {
+    const rgbO = rgb2object(rgb);
+    this.palette.updateRGB(rgbO.r, rgbO.g, rgbO.b);
   }
 }
 
