@@ -7,7 +7,7 @@ interface MatchPattern {
   type: string, // 可选值'tagName' | 'style' | 'tagNameAttribute',
   tagName?: string, // 'tagNameAttribute'
   attribute?: string | string[], // 'tagNameAttribute'
-  value: any  // type为‘tagname’时，value为string；type为‘style’时，value为对象
+  value?: any  // type为‘tagname’时，value为string；type为‘style’时，value为对象
 }
 
 class Editor extends Emitter {
@@ -83,7 +83,7 @@ class Editor extends Emitter {
   // 2.恢复选区范围对象
   // 3.执行document.execCommand之后，选区对象中的范围对象被改变，需要重新保存范围对象
   execCommand(commandName: string, showDefaultUI: boolean = false, value: string = null) {
-    // this.el.focus();
+    this.el.focus();
     this.restoreSelection();
     document.execCommand(commandName, showDefaultUI, value);
     this.currentRange = this.getRange();
@@ -91,7 +91,7 @@ class Editor extends Emitter {
   }
 
   // 选中选区是否与工具栏模式匹配
-  match(matchPattern: MatchPattern): boolean {
+  match(matchPattern: MatchPattern): any {
     const range = this.getRange();
     if (!range) return false;
     
@@ -123,9 +123,14 @@ class Editor extends Emitter {
     } else if (matchPattern.type === 'tagNameAttribute') {
       const node = nodeChain.find(node => node.tagName === matchPattern.tagName);
       if (!node) return null;
-      let attrValAttr = (typeof matchPattern.value === 'string') ? [matchPattern.value] : matchPattern.value;
-      let value = attrValAttr.find(val => node.getAttribute(matchPattern.attribute) === val);
-      return value;
+      if (matchPattern.value) {
+        let attrValAttr = (typeof matchPattern.value === 'string') ? [matchPattern.value] : matchPattern.value;
+        let value = attrValAttr.find(val => node.getAttribute(matchPattern.attribute) === val);
+        return value;
+      } else {
+        let attr = matchPattern.attribute;
+        return node.getAttribute(attr);
+      }
     }
     return false;
   }

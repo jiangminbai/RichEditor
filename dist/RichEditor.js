@@ -989,7 +989,7 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
     // 2.恢复选区范围对象
     // 3.执行document.execCommand之后，选区对象中的范围对象被改变，需要重新保存范围对象
     execCommand(commandName, showDefaultUI = false, value = null) {
-        // this.el.focus();
+        this.el.focus();
         this.restoreSelection();
         document.execCommand(commandName, showDefaultUI, value);
         this.currentRange = this.getRange();
@@ -1032,9 +1032,15 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
             const node = nodeChain.find(node => node.tagName === matchPattern.tagName);
             if (!node)
                 return null;
-            let attrValAttr = (typeof matchPattern.value === 'string') ? [matchPattern.value] : matchPattern.value;
-            let value = attrValAttr.find(val => node.getAttribute(matchPattern.attribute) === val);
-            return value;
+            if (matchPattern.value) {
+                let attrValAttr = (typeof matchPattern.value === 'string') ? [matchPattern.value] : matchPattern.value;
+                let value = attrValAttr.find(val => node.getAttribute(matchPattern.attribute) === val);
+                return value;
+            }
+            else {
+                let attr = matchPattern.attribute;
+                return node.getAttribute(attr);
+            }
         }
         return false;
     }
@@ -1638,7 +1644,7 @@ class ForeColor {
         this.colorPicker = new ColorPicker(this.colorButton.el);
         this.colorButton.on('click', e => this.onClick(e));
         this.colorPicker.on('change', color => this.onPickerChange(color));
-        editor.on('rangechange', this.onRangeChange.bind(this));
+        editor.on('rangechange', () => this.onRangeChange());
     }
     onClick(e) {
         if (!this.colorPicker.visible)
@@ -1652,11 +1658,17 @@ class ForeColor {
         this.editor.execCommand('foreColor', false, rgb);
     }
     onRangeChange() {
-        // const isMatch = this.editor.match({
-        //   type: 'tagName',
-        //   value: 'B'
-        // })
-        // isMatch ? this.colo.setActive() : this.button.resetActive();
+        const color = this.editor.match({
+            type: 'tagNameAttribute',
+            tagName: 'FONT',
+            attribute: 'color'
+        });
+        if (color) {
+            this.colorButton.setColor(color);
+        }
+        else {
+            this.colorButton.setColor('rgb(0, 0, 0)');
+        }
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (ForeColor);

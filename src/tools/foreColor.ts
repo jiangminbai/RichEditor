@@ -26,7 +26,7 @@ class ForeColor {
 
     this.colorButton.on('click', e => this.onClick(e));
     this.colorPicker.on('change', color => this.onPickerChange(color));
-    editor.on('rangechange', this.onRangeChange.bind(this));
+    editor.on('rangechange', () => this.onRangeChange());
   }
 
   onClick(e){
@@ -43,11 +43,16 @@ class ForeColor {
   }
 
   onRangeChange() {
-    // const isMatch = this.editor.match({
-    //   type: 'tagName',
-    //   value: 'B'
-    // })
-    // isMatch ? this.colo.setActive() : this.button.resetActive();
+    const color = this.editor.match({
+      type: 'tagNameAttribute',
+      tagName: 'FONT',
+      attribute: 'color'
+    })
+    if (color) {
+      this.colorButton.setColor(color);
+    } else {
+      this.colorButton.setColor('rgb(0, 0, 0)');
+    }
   }
 }
 
