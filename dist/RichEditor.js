@@ -163,12 +163,12 @@ class ColorButton extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] 
         this.el.innerHTML = svg;
     }
     setColor(rgb) {
-        const rect = this.el.querySelector('rect');
+        const rect = this.el.querySelector('.color-underline');
         rect.setAttribute('fill', rgb);
         rect.setAttribute('stroke', rgb);
     }
     getColor() {
-        const rect = this.el.querySelector('rect');
+        const rect = this.el.querySelector('.color-underline');
         const fillColor = rect.getAttribute('fill');
         if (!fillColor)
             return 'rgb(0,0,0)';
@@ -250,6 +250,15 @@ function hsv2rgb(h, s, v) {
     b = Math.round(b * 255);
     var value = `rgb(${r}, ${g}, ${b})`;
     return { value, r, g, b, h: h / 6, s, v };
+}
+function hex2rgb(hex) {
+    if (hex.indexOf('#') > -1)
+        hex = hex.slice(1);
+    var bigint = parseInt(hex, 16);
+    var r = (bigint >> 16) & 255;
+    var g = (bigint >> 8) & 255;
+    var b = bigint & 255;
+    return `rgb(${r}, ${g}, ${b})`;
 }
 // 调色板
 class Palette extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] {
@@ -437,7 +446,6 @@ class Hub extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] {
         return this.right / this.bar.clientWidth;
     }
     update(hub) {
-        console.log(hub);
         this.right = this.bar.clientWidth * hub;
         this.btn.style.right = this.right + 'px';
     }
@@ -656,6 +664,10 @@ class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
     show(rgb) {
         this.visible = true;
         this.el.style.display = 'block';
+        console.log(rgb);
+        if (_util_util__WEBPACK_IMPORTED_MODULE_0__["hexPattern"].test(rgb))
+            rgb = hex2rgb(rgb);
+        console.log(rgb);
         const rgbO = rgb2object(rgb);
         this.palette.updateRGB(rgbO.r, rgbO.g, rgbO.b);
     }
@@ -1023,19 +1035,29 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
             // value: object
         }
         else if (matchPattern.type === 'style') {
-            return Object.keys(value).some(key => {
-                return nodeChain.some(node => node.style[key] === value[key]);
-            });
+            if (value) {
+                return Object.keys(value).some(key => {
+                    return nodeChain.some(node => node.style[key] === value[key]);
+                });
+            }
+            else {
+                for (let i = 0; i < nodeChain.length; i++) {
+                    const styleValue = nodeChain[i].style[matchPattern.styleName];
+                    if (styleValue) {
+                        return styleValue;
+                    }
+                }
+            }
             // value: object
         }
         else if (matchPattern.type === 'tagNameAttribute') {
             const node = nodeChain.find(node => node.tagName === matchPattern.tagName);
             if (!node)
                 return null;
-            if (matchPattern.value) {
-                let attrValAttr = (typeof matchPattern.value === 'string') ? [matchPattern.value] : matchPattern.value;
-                let value = attrValAttr.find(val => node.getAttribute(matchPattern.attribute) === val);
-                return value;
+            if (value) {
+                let attrValAttr = (typeof value === 'string') ? [value] : value;
+                let val = attrValAttr.find(val => node.getAttribute(matchPattern.attribute) === val);
+                return val;
             }
             else {
                 let attr = matchPattern.attribute;
@@ -1240,7 +1262,7 @@ const svgs = {
     'gallery': '<svg width="24" height="24"><path fill-rule="nonzero" d="M5 15.7l2.3-2.2c.3-.3.7-.3 1 0L11 16l5.1-5c.3-.4.8-.4 1 0l2 1.9V8H5v7.7zM5 18V19h3l1.8-1.9-2-2L5 17.9zm14-3l-2.5-2.4-6.4 6.5H19v-4zM4 6h16c.6 0 1 .4 1 1v13c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1V7c0-.6.4-1 1-1zm6 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM4.5 4h15a.5.5 0 1 1 0 1h-15a.5.5 0 0 1 0-1zm2-2h11a.5.5 0 1 1 0 1h-11a.5.5 0 0 1 0-1z"/></svg>',
     'gamma': '<svg width="24" height="24"><path d="M4 3h16c.6 0 1 .4 1 1v16c0 .6-.4 1-1 1H4a1 1 0 0 1-1-1V4c0-.6.4-1 1-1zm1 2v14h14V5H5zm6.5 11.8V14L9.2 8.7a5.1 5.1 0 0 0-.4-.8l-.1-.2H8 8v-1l.3-.1.3-.1h.7a1 1 0 0 1 .6.5l.1.3a8.5 8.5 0 0 1 .3.6l1.9 4.6 2-5.2a1 1 0 0 1 1-.6.5.5 0 0 1 .5.6L13 14v2.8a.7.7 0 0 1-1.4 0z" fill-rule="nonzero"/></svg>',
     'help': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M12 5.5a6.5 6.5 0 0 0-6 9 6.3 6.3 0 0 0 1.4 2l1 1a6.3 6.3 0 0 0 3.6 1 6.5 6.5 0 0 0 6-9 6.3 6.3 0 0 0-1.4-2l-1-1a6.3 6.3 0 0 0-3.6-1zM12 4a7.8 7.8 0 0 1 5.7 2.3A8 8 0 1 1 12 4z"/><path d="M9.6 9.7a.7.7 0 0 1-.7-.8c0-1.1 1.5-1.8 3.2-1.8 1.8 0 3.2.8 3.2 2.4 0 1.4-.4 2.1-1.5 2.8-.2 0-.3.1-.3.2a2 2 0 0 0-.8.8.8.8 0 0 1-1.4-.6c.3-.7.8-1 1.3-1.5l.4-.2c.7-.4.8-.6.8-1.5 0-.5-.6-.9-1.7-.9-.5 0-1 .1-1.4.3-.2 0-.3.1-.3.2v-.2c0 .4-.4.8-.8.8z" fill-rule="nonzero"/><circle cx="12" cy="16" r="1"/></g></svg>',
-    'highlight-bg-color': '<svg width="24" height="24"><g fill-rule="evenodd"><path id="tox-icon-highlight-bg-color__color" d="M3 18h18v3H3z"/><path fill-rule="nonzero" d="M7.7 16.7H3l3.3-3.3-.7-.8L10.2 8l4 4.1-4 4.2c-.2.2-.6.2-.8 0l-.6-.7-1.1 1.1zm5-7.5L11 7.4l3-2.9a2 2 0 0 1 2.6 0L18 6c.7.7.7 2 0 2.7l-2.9 2.9-1.8-1.8-.5-.6"/></g></svg>',
+    'highlight-bg-color': '<svg width="24" height="24"><g fill-rule="evenodd"><path class="color-underline" d="M3 18h18v3H3z"/><path fill-rule="nonzero" d="M7.7 16.7H3l3.3-3.3-.7-.8L10.2 8l4 4.1-4 4.2c-.2.2-.6.2-.8 0l-.6-.7-1.1 1.1zm5-7.5L11 7.4l3-2.9a2 2 0 0 1 2.6 0L18 6c.7.7.7 2 0 2.7l-2.9 2.9-1.8-1.8-.5-.6"/></g></svg>',
     'home': '<svg width="24" height="24"><path fill-rule="nonzero" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
     'horizontal-rule': '<svg width="24" height="24"><path d="M4 11h16v2H4z" fill-rule="evenodd"/></svg>',
     'image-options': '<svg width="24" height="24"><path d="M6 10a2 2 0 0 0-2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2 2 2 0 0 0-2-2zm12 0a2 2 0 0 0-2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2 2 2 0 0 0-2-2zm-6 0a2 2 0 0 0-2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2 2 2 0 0 0-2-2z" fill-rule="nonzero"/></svg>',
@@ -1329,7 +1351,7 @@ const svgs = {
     'template': '<svg width="24" height="24"><path d="M19 19v-1H5v1h14zM9 16v-4a5 5 0 1 1 6 0v4h4a2 2 0 0 1 2 2v3H3v-3c0-1.1.9-2 2-2h4zm4 0v-5l.8-.6a3 3 0 1 0-3.6 0l.8.6v5h2z" fill-rule="nonzero"/></svg>',
     'temporary-placeholder': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M9 7.6V6h2.5V4.5a.5.5 0 1 1 1 0V6H15v1.6a8 8 0 1 1-6 0zm-2.6 5.3a.5.5 0 0 0 .3.6c.3 0 .6 0 .6-.3l.1-.2a5 5 0 0 1 3.3-2.8c.3-.1.4-.4.4-.6-.1-.3-.4-.5-.6-.4a6 6 0 0 0-4.1 3.7z"/><circle cx="14" cy="4" r="1"/><circle cx="12" cy="2" r="1"/><circle cx="10" cy="4" r="1"/></g></svg>',
     // 'text-color': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M3 18h18v3H3z"/><path d="M8.7 16h-.8a.5.5 0 0 1-.5-.6l2.7-9c.1-.3.3-.4.5-.4h2.8c.2 0 .4.1.5.4l2.7 9a.5.5 0 0 1-.5.6h-.8a.5.5 0 0 1-.4-.4l-.7-2.2c0-.3-.3-.4-.5-.4h-3.4c-.2 0-.4.1-.5.4l-.7 2.2c0 .3-.2.4-.4.4zm2.6-7.6l-.6 2a.5.5 0 0 0 .5.6h1.6a.5.5 0 0 0 .5-.6l-.6-2c0-.3-.3-.4-.5-.4h-.4c-.2 0-.4.1-.5.4z"/></g></svg>',
-    'text-color': '<svg width="24" height="24"><path id="lineAB" d="M 6 15 L 12 2M 12 2 L 18 15M 8 10 l 8 0" stroke-width="2" stroke="rgb(0,0,0)" fill="none" /><rect x="3" y="18" width="18" height="2"></rect></svg>',
+    'text-color': '<svg width="24" height="24"><path id="lineAB" d="M 6 15 L 12 2M 12 2 L 18 15M 8 10 l 8 0" stroke-width="2" stroke="rgb(0,0,0)" fill="none" /><rect class="color-underline" x="3" y="18" width="18" height="2"></rect></svg>',
     'toc': '<svg width="24" height="24"><path d="M5 5c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 1 1 0-2zm3 0h11c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 1 1 0-2zm-3 8c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h11c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2zm0-4c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 1 1 0-2zm3 0h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm-3 8c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
     'translate': '<svg width="24" height="24"><path d="M12.7 14.3l-.3.7-.4.7-2.2-2.2-3.1 3c-.3.4-.8.4-1 0a.7.7 0 0 1 0-1l3.1-3A12.4 12.4 0 0 1 6.7 9H8a10.1 10.1 0 0 0 1.7 2.4c.5-.5 1-1.1 1.4-1.8l.9-2H4.7a.7.7 0 1 1 0-1.5h4.4v-.7c0-.4.3-.8.7-.8.4 0 .7.4.7.8v.7H15c.4 0 .8.3.8.7 0 .4-.4.8-.8.8h-1.4a12.3 12.3 0 0 1-1 2.4 13.5 13.5 0 0 1-1.7 2.3l1.9 1.8zm4.3-3l2.7 7.3a.5.5 0 0 1-.4.7 1 1 0 0 1-1-.7l-.6-1.5h-3.4l-.6 1.5a1 1 0 0 1-1 .7.5.5 0 0 1-.4-.7l2.7-7.4a1 1 0 1 1 2 0zm-2.2 4.4h2.4L16 12.5l-1.2 3.2z" fill-rule="evenodd"/></svg>',
     'underline': '<svg width="24" height="24"><path d="M16 5c.6 0 1 .4 1 1v5.5a4 4 0 0 1-.4 1.8l-1 1.4a5.3 5.3 0 0 1-5.5 1 5 5 0 0 1-1.6-1c-.5-.4-.8-.9-1.1-1.4a4 4 0 0 1-.4-1.8V6c0-.6.4-1 1-1s1 .4 1 1v5.5c0 .3 0 .6.2 1l.6.7a3.3 3.3 0 0 0 2.2.8 3.4 3.4 0 0 0 2.2-.8c.3-.2.4-.5.6-.8l.2-.9V6c0-.6.4-1 1-1zM8 17h8c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
@@ -1373,9 +1395,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tools_fontsize__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../tools/fontsize */ "./src/tools/fontsize.ts");
 /* harmony import */ var _tools_fontname__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../tools/fontname */ "./src/tools/fontname.ts");
 /* harmony import */ var _tools_foreColor__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../tools/foreColor */ "./src/tools/foreColor.ts");
+/* harmony import */ var _tools_textBgColor__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../tools/textBgColor */ "./src/tools/textBgColor.ts");
 /**
  * 工具栏类
  */
+
 
 
 
@@ -1455,6 +1479,10 @@ class Toolbar {
             {
                 name: 'forecolor',
                 module: new _tools_foreColor__WEBPACK_IMPORTED_MODULE_14__["default"]()
+            },
+            {
+                name: 'text-bg-color',
+                module: new _tools_textBgColor__WEBPACK_IMPORTED_MODULE_15__["default"]()
             }
         ];
         plugins.forEach(plugin => {
@@ -1653,7 +1681,6 @@ class ForeColor {
             this.colorPicker.hide();
     }
     onPickerChange(rgb) {
-        console.log(rgb);
         this.colorButton.setColor(rgb);
         this.editor.execCommand('foreColor', false, rgb);
     }
@@ -1942,6 +1969,56 @@ class StrikeThrough {
 
 /***/ }),
 
+/***/ "./src/tools/textBgColor.ts":
+/*!**********************************!*\
+  !*** ./src/tools/textBgColor.ts ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class TextBgColor {
+    install(context) {
+        const { editor, svgs, toolbar, control } = context;
+        this.editor = editor;
+        const ColorButton = control.require('colorButton');
+        this.colorButton = new ColorButton(toolbar.el);
+        this.colorButton.setIcon(svgs["highlight-bg-color"]);
+        const ColorPicker = control.require('colorPicker');
+        this.colorPicker = new ColorPicker(this.colorButton.el);
+        this.colorButton.on('click', e => this.onClick(e));
+        this.colorPicker.on('change', color => this.onPickerChange(color));
+        editor.on('rangechange', () => this.onRangeChange());
+    }
+    onClick(e) {
+        if (!this.colorPicker.visible)
+            this.colorPicker.show(this.colorButton.getColor());
+        else
+            this.colorPicker.hide();
+    }
+    onPickerChange(rgb) {
+        this.colorButton.setColor(rgb);
+        this.editor.execCommand('hiliteColor', false, rgb);
+    }
+    onRangeChange() {
+        const color = this.editor.match({
+            type: 'style',
+            styleName: 'backgroundColor'
+        });
+        if (color) {
+            this.colorButton.setColor(color);
+        }
+        else {
+            this.colorButton.setColor('rgb(0, 0, 0)');
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (TextBgColor);
+
+
+/***/ }),
+
 /***/ "./src/tools/underline.ts":
 /*!********************************!*\
   !*** ./src/tools/underline.ts ***!
@@ -2058,17 +2135,20 @@ class UnorderedList {
 /*!**************************!*\
   !*** ./src/util/util.ts ***!
   \**************************/
-/*! exports provided: nonNumber */
+/*! exports provided: nonNumber, hexPattern */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "nonNumber", function() { return nonNumber; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hexPattern", function() { return hexPattern; });
 /**
  * 工具函数
  */
 // 含有非数字字符
 const nonNumber = /[^0-9]/g;
+// hex 颜色
+const hexPattern = /#[0-9a-fA-F]+$/;
 
 
 /***/ })

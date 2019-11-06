@@ -18,6 +18,7 @@ import UnorderedList from '../tools/unorderedList';
 import FontSize from '../tools/fontsize';
 import FontName from '../tools/fontname';
 import ForeColor from '../tools/foreColor';
+import TextBgColor from '../tools/textBgColor';
 
 class Toolbar {
   el: HTMLElement;
@@ -86,6 +87,10 @@ class Toolbar {
       {
         name: 'forecolor',
         module: new ForeColor()
+      },
+      {
+        name: 'text-bg-color',
+        module: new TextBgColor()
       }
     ]
 

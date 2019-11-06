@@ -23,13 +23,13 @@ class ColorButton extends Emitter {
   }
 
   public setColor(rgb: string) {
-    const rect = this.el.querySelector('rect');
+    const rect = this.el.querySelector('.color-underline');
     rect.setAttribute('fill', rgb);
     rect.setAttribute('stroke', rgb);
   }
 
   public getColor(): string {
-    const rect = this.el.querySelector('rect');
+    const rect = this.el.querySelector('.color-underline');
     const fillColor = rect.getAttribute('fill');
     if (!fillColor) return 'rgb(0,0,0)';
     return fillColor;

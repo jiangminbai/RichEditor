@@ -1,5 +1,5 @@
 /**
- * 文字颜色
+ * 文字背景颜色
  */
 import RichEditor from '../core/richEditor';
 import Editor from '../core/editor';
@@ -7,7 +7,7 @@ import ColorButton from '../controls/colorButton';
 import ColorPicker from '../controls/colorPicker';
 
 
-class ForeColor {
+class TextBgColor {
   editor: Editor;
   colorButton: ColorButton;
   colorPicker: ColorPicker;
@@ -18,7 +18,7 @@ class ForeColor {
 
     const ColorButton = control.require('colorButton');
     this.colorButton = new ColorButton(toolbar.el);
-    this.colorButton.setIcon(svgs["text-color"]);
+    this.colorButton.setIcon(svgs["highlight-bg-color"]);
 
     const ColorPicker = control.require('colorPicker');
     this.colorPicker = new ColorPicker(this.colorButton.el);
@@ -38,14 +38,13 @@ class ForeColor {
 
   onPickerChange(rgb: string) {
     this.colorButton.setColor(rgb);
-    this.editor.execCommand('foreColor',false, rgb);
+    this.editor.execCommand('hiliteColor',false, rgb);
   }
 
   onRangeChange() {
     const color = this.editor.match({
-      type: 'tagNameAttribute',
-      tagName: 'FONT',
-      attribute: 'color'
+      type: 'style',
+      styleName: 'backgroundColor'
     })
     if (color) {
       this.colorButton.setColor(color);
@@ -55,4 +54,4 @@ class ForeColor {
   }
 }
 
-export default ForeColor;
+export default TextBgColor;

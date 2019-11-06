@@ -15,7 +15,8 @@
  */
 
 import {
-  nonNumber
+  nonNumber,
+  hexPattern
 } from '../util/util';
 
  // 调色板构造函数参数
@@ -78,6 +79,16 @@ function hsv2rgb(h: number, s: number, v: number) {
       var value = `rgb(${r}, ${g}, ${b})`;
 
   return { value, r, g, b, h: h / 6, s, v };
+}
+
+function hex2rgb(hex: string) {
+  if (hex.indexOf('#') > -1) hex = hex.slice(1);
+  var bigint = parseInt(hex, 16);
+  var r = (bigint >> 16) & 255;
+  var g = (bigint >> 8) & 255;
+  var b = bigint & 255;
+
+  return `rgb(${r}, ${g}, ${b})`;
 }
 
 // 调色板
@@ -316,7 +327,6 @@ class Hub extends Emitter {
   }
 
   public update(hub: number) {
-    console.log(hub);
     this.right = this.bar.clientWidth * hub;
     this.btn.style.right = this.right + 'px';
   }
@@ -598,6 +608,9 @@ class ColorPicker extends Emitter {
   public show(rgb: string) {
     this.visible = true;
     this.el.style.display = 'block';
+    console.log(rgb);
+    if (hexPattern.test(rgb)) rgb = hex2rgb(rgb);
+    console.log(rgb);
 
     const rgbO = rgb2object(rgb);
     this.palette.updateRGB(rgbO.r, rgbO.g, rgbO.b);
