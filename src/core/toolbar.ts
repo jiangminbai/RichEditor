@@ -17,6 +17,7 @@ import OrderedList from '../tools/orderedList';
 import UnorderedList from '../tools/unorderedList';
 import FontSize from '../tools/fontsize';
 import FontName from '../tools/fontname';
+import ForeColor from '../tools/foreColor';
 
 class Toolbar {
   el: HTMLElement;
@@ -81,6 +82,10 @@ class Toolbar {
       {
         name: 'fontname',
         module: new FontName()
+      },
+      {
+        name: 'forecolor',
+        module: new ForeColor()
       }
     ]
 

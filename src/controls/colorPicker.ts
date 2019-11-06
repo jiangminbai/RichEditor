@@ -405,10 +405,11 @@ class RGBControl extends Emitter {
 }
 
 // 颜色显示器
-class ColorDisplay {
+class ColorDisplay extends Emitter {
   el: HTMLElement;
 
   constructor(container) {
+    super();
     this.el = document.createElement('div');
     this.el.className = 'rd_color-display';
     container.appendChild(this.el);
@@ -416,6 +417,7 @@ class ColorDisplay {
 
   update(rgb: string) {
     this.el.style.background = rgb;
+    this.fire('change', rgb);
   }
 }
 
@@ -483,8 +485,9 @@ class ColorPicker extends Emitter {
   colorDisplay: ColorDisplay;
   rgbControl: RGBControl;
   colorSelect: ColorSelect;
+  visible: boolean = false;
 
-  constructor(e: MouseEvent) {
+  constructor(element: HTMLElement) {
     super();
     this.el = document.createElement('div');
     this.el.className = 'rd_color-picker';
@@ -507,7 +510,6 @@ class ColorPicker extends Emitter {
       this.hub.update(color.h);
       this.colorDisplay.update(color.value);
       this.rgbControl.updateRGB(color.r, color.g, color.b);
-      this.fire('change', color);
     })
 
     this.palette.on('h-change', color => {
@@ -528,15 +530,25 @@ class ColorPicker extends Emitter {
       this.palette.updateRGB(color.r, color.g, color.b);
     })
 
-    const rect = (<HTMLElement>e.target).getBoundingClientRect();
+    this.colorDisplay.on('change', rgb => this.fire('change', rgb));
+
+    const rect = element.getBoundingClientRect();
     this.el.style.top = rect.bottom + 'px';
     this.el.style.left = rect.left + 'px';
+    this.el.style.display = 'none';
     document.body.appendChild(this.el);
   }
 
-  public update(rgb: string) {
+  public show(rgb: string) {
+    this.visible = true;
+    this.el.style.display = 'block';
+
     const rgbO = rgb2object(rgb);
     this.palette.updateRGB(rgbO.r, rgbO.g, rgbO.b);
+  }
+
+  public hide() {
+    this.el.style.display = 'none';
   }
 }
 

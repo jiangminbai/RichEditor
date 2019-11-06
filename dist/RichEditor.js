@@ -135,6 +135,51 @@ class Button extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
+/***/ "./src/controls/colorButton.ts":
+/*!*************************************!*\
+  !*** ./src/controls/colorButton.ts ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_emitter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/emitter */ "./src/core/emitter.ts");
+/**
+ * 颜色按钮类
+ */
+
+class ColorButton extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor(container) {
+        super();
+        this.el = document.createElement('div');
+        this.el.className = 'richeditor_toolbarItem';
+        container.appendChild(this.el);
+        this.el.addEventListener('click', (e) => {
+            this.fire('click', e);
+        });
+    }
+    setIcon(svg) {
+        this.el.innerHTML = svg;
+    }
+    setColor(rgb) {
+        const rect = this.el.querySelector('rect');
+        rect.setAttribute('fill', rgb);
+        rect.setAttribute('stroke', rgb);
+    }
+    getColor() {
+        const rect = this.el.querySelector('rect');
+        const fillColor = rect.getAttribute('fill');
+        if (!fillColor)
+            return 'rgb(0,0,0)';
+        return fillColor;
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (ColorButton);
+
+
+/***/ }),
+
 /***/ "./src/controls/colorPicker.ts":
 /*!*************************************!*\
   !*** ./src/controls/colorPicker.ts ***!
@@ -463,14 +508,16 @@ class RGBControl extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] {
     }
 }
 // 颜色显示器
-class ColorDisplay {
+class ColorDisplay extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] {
     constructor(container) {
+        super();
         this.el = document.createElement('div');
         this.el.className = 'rd_color-display';
         container.appendChild(this.el);
     }
     update(rgb) {
         this.el.style.background = rgb;
+        this.fire('change', rgb);
     }
 }
 // 颜色选择列表
@@ -523,8 +570,9 @@ class ColorSelect extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
 }
 // 颜色拾取器
 class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] {
-    constructor(e) {
+    constructor(element) {
         super();
+        this.visible = false;
         this.el = document.createElement('div');
         this.el.className = 'rd_color-picker';
         this.palette = new Palette(this.el, { width: '180px', height: '125px' });
@@ -542,7 +590,6 @@ class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
             this.hub.update(color.h);
             this.colorDisplay.update(color.value);
             this.rgbControl.updateRGB(color.r, color.g, color.b);
-            this.fire('change', color);
         });
         this.palette.on('h-change', color => {
             this.colorDisplay.update(color.value);
@@ -558,14 +605,21 @@ class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
         this.rgbControl.on('change', color => {
             this.palette.updateRGB(color.r, color.g, color.b);
         });
-        const rect = e.target.getBoundingClientRect();
+        this.colorDisplay.on('change', rgb => this.fire('change', rgb));
+        const rect = element.getBoundingClientRect();
         this.el.style.top = rect.bottom + 'px';
         this.el.style.left = rect.left + 'px';
+        this.el.style.display = 'none';
         document.body.appendChild(this.el);
     }
-    update(rgb) {
+    show(rgb) {
+        this.visible = true;
+        this.el.style.display = 'block';
         const rgbO = rgb2object(rgb);
         this.palette.updateRGB(rgbO.r, rgbO.g, rgbO.b);
+    }
+    hide() {
+        this.el.style.display = 'none';
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (ColorPicker);
@@ -787,10 +841,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _controls_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../controls/select */ "./src/controls/select.ts");
 /* harmony import */ var _controls_selectButton__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../controls/selectButton */ "./src/controls/selectButton.ts");
 /* harmony import */ var _controls_selectMenu__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../controls/selectMenu */ "./src/controls/selectMenu.ts");
-/* harmony import */ var _controls_colorPicker__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../controls/colorPicker */ "./src/controls/colorPicker.ts");
+/* harmony import */ var _controls_colorButton__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../controls/colorButton */ "./src/controls/colorButton.ts");
+/* harmony import */ var _controls_colorPicker__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../controls/colorPicker */ "./src/controls/colorPicker.ts");
 /**
  * 控件管理类
  */
+
 
 
 
@@ -803,7 +859,8 @@ class Control {
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('select', _controls_select__WEBPACK_IMPORTED_MODULE_2__["default"]);
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('selectButton', _controls_selectButton__WEBPACK_IMPORTED_MODULE_3__["default"]);
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('selectMenu', _controls_selectMenu__WEBPACK_IMPORTED_MODULE_4__["default"]);
-        _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('colorPicker', _controls_colorPicker__WEBPACK_IMPORTED_MODULE_5__["default"]);
+        _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('colorPicker', _controls_colorPicker__WEBPACK_IMPORTED_MODULE_6__["default"]);
+        _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('colorButton', _controls_colorButton__WEBPACK_IMPORTED_MODULE_5__["default"]);
     }
     register(name, control) {
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl(name, control);
@@ -894,7 +951,7 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         const startContainer = range.startContainer;
         let node = startContainer;
         let nodeChain = []; // 点击位置往上搜集的节点链
-        while (node.nodeType === 3 || !node.classList.contains('richeditor_area')) {
+        while (node.nodeType === 3 || node !== this.el) {
             if (node.nodeType !== 3)
                 nodeChain.push(node); // 排除text节点
             node = node.parentNode;
@@ -1212,7 +1269,8 @@ const svgs = {
     'table': '<svg width="24" height="24"><path d="M4 5h16v14H4V5zm6 9h4v-3h-4v3zm4 1h-4v3h4v-3zm0-8h-4v3h4V7zM9 7H5v3h4V7zm-4 4v3h4v-3H5zm10 0v3h4v-3h-4zm0-1h4V7h-4v3zM5 15v3h4v-3H5zm10 3h4v-3h-4v3z" fill-rule="evenodd"/></svg>',
     'template': '<svg width="24" height="24"><path d="M19 19v-1H5v1h14zM9 16v-4a5 5 0 1 1 6 0v4h4a2 2 0 0 1 2 2v3H3v-3c0-1.1.9-2 2-2h4zm4 0v-5l.8-.6a3 3 0 1 0-3.6 0l.8.6v5h2z" fill-rule="nonzero"/></svg>',
     'temporary-placeholder': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M9 7.6V6h2.5V4.5a.5.5 0 1 1 1 0V6H15v1.6a8 8 0 1 1-6 0zm-2.6 5.3a.5.5 0 0 0 .3.6c.3 0 .6 0 .6-.3l.1-.2a5 5 0 0 1 3.3-2.8c.3-.1.4-.4.4-.6-.1-.3-.4-.5-.6-.4a6 6 0 0 0-4.1 3.7z"/><circle cx="14" cy="4" r="1"/><circle cx="12" cy="2" r="1"/><circle cx="10" cy="4" r="1"/></g></svg>',
-    'text-color': '<svg width="24" height="24"><g fill-rule="evenodd"><path id="tox-icon-text-color__color" d="M3 18h18v3H3z"/><path d="M8.7 16h-.8a.5.5 0 0 1-.5-.6l2.7-9c.1-.3.3-.4.5-.4h2.8c.2 0 .4.1.5.4l2.7 9a.5.5 0 0 1-.5.6h-.8a.5.5 0 0 1-.4-.4l-.7-2.2c0-.3-.3-.4-.5-.4h-3.4c-.2 0-.4.1-.5.4l-.7 2.2c0 .3-.2.4-.4.4zm2.6-7.6l-.6 2a.5.5 0 0 0 .5.6h1.6a.5.5 0 0 0 .5-.6l-.6-2c0-.3-.3-.4-.5-.4h-.4c-.2 0-.4.1-.5.4z"/></g></svg>',
+    // 'text-color': '<svg width="24" height="24"><g fill-rule="evenodd"><path d="M3 18h18v3H3z"/><path d="M8.7 16h-.8a.5.5 0 0 1-.5-.6l2.7-9c.1-.3.3-.4.5-.4h2.8c.2 0 .4.1.5.4l2.7 9a.5.5 0 0 1-.5.6h-.8a.5.5 0 0 1-.4-.4l-.7-2.2c0-.3-.3-.4-.5-.4h-3.4c-.2 0-.4.1-.5.4l-.7 2.2c0 .3-.2.4-.4.4zm2.6-7.6l-.6 2a.5.5 0 0 0 .5.6h1.6a.5.5 0 0 0 .5-.6l-.6-2c0-.3-.3-.4-.5-.4h-.4c-.2 0-.4.1-.5.4z"/></g></svg>',
+    'text-color': '<svg width="24" height="24"><path id="lineAB" d="M 6 15 L 12 2M 12 2 L 18 15M 8 10 l 8 0" stroke-width="2" stroke="rgb(0,0,0)" fill="none" /><rect x="3" y="18" width="18" height="2"></rect></svg>',
     'toc': '<svg width="24" height="24"><path d="M5 5c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 1 1 0-2zm3 0h11c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 1 1 0-2zm-3 8c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h11c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2zm0-4c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 1 1 0-2zm3 0h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2zm-3 8c.6 0 1 .4 1 1s-.4 1-1 1a1 1 0 0 1 0-2zm3 0h8c.6 0 1 .4 1 1s-.4 1-1 1h-8a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
     'translate': '<svg width="24" height="24"><path d="M12.7 14.3l-.3.7-.4.7-2.2-2.2-3.1 3c-.3.4-.8.4-1 0a.7.7 0 0 1 0-1l3.1-3A12.4 12.4 0 0 1 6.7 9H8a10.1 10.1 0 0 0 1.7 2.4c.5-.5 1-1.1 1.4-1.8l.9-2H4.7a.7.7 0 1 1 0-1.5h4.4v-.7c0-.4.3-.8.7-.8.4 0 .7.4.7.8v.7H15c.4 0 .8.3.8.7 0 .4-.4.8-.8.8h-1.4a12.3 12.3 0 0 1-1 2.4 13.5 13.5 0 0 1-1.7 2.3l1.9 1.8zm4.3-3l2.7 7.3a.5.5 0 0 1-.4.7 1 1 0 0 1-1-.7l-.6-1.5h-3.4l-.6 1.5a1 1 0 0 1-1 .7.5.5 0 0 1-.4-.7l2.7-7.4a1 1 0 1 1 2 0zm-2.2 4.4h2.4L16 12.5l-1.2 3.2z" fill-rule="evenodd"/></svg>',
     'underline': '<svg width="24" height="24"><path d="M16 5c.6 0 1 .4 1 1v5.5a4 4 0 0 1-.4 1.8l-1 1.4a5.3 5.3 0 0 1-5.5 1 5 5 0 0 1-1.6-1c-.5-.4-.8-.9-1.1-1.4a4 4 0 0 1-.4-1.8V6c0-.6.4-1 1-1s1 .4 1 1v5.5c0 .3 0 .6.2 1l.6.7a3.3 3.3 0 0 0 2.2.8 3.4 3.4 0 0 0 2.2-.8c.3-.2.4-.5.6-.8l.2-.9V6c0-.6.4-1 1-1zM8 17h8c.6 0 1 .4 1 1s-.4 1-1 1H8a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>',
@@ -1255,9 +1313,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tools_unorderedList__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../tools/unorderedList */ "./src/tools/unorderedList.ts");
 /* harmony import */ var _tools_fontsize__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../tools/fontsize */ "./src/tools/fontsize.ts");
 /* harmony import */ var _tools_fontname__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../tools/fontname */ "./src/tools/fontname.ts");
+/* harmony import */ var _tools_foreColor__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../tools/foreColor */ "./src/tools/foreColor.ts");
 /**
  * 工具栏类
  */
+
 
 
 
@@ -1332,6 +1392,10 @@ class Toolbar {
             {
                 name: 'fontname',
                 module: new _tools_fontname__WEBPACK_IMPORTED_MODULE_13__["default"]()
+            },
+            {
+                name: 'forecolor',
+                module: new _tools_foreColor__WEBPACK_IMPORTED_MODULE_14__["default"]()
             }
         ];
         plugins.forEach(plugin => {
@@ -1494,6 +1558,52 @@ class FontSize {
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (FontSize);
+
+
+/***/ }),
+
+/***/ "./src/tools/foreColor.ts":
+/*!********************************!*\
+  !*** ./src/tools/foreColor.ts ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class ForeColor {
+    install(context) {
+        const { editor, svgs, toolbar, control } = context;
+        this.editor = editor;
+        const ColorButton = control.require('colorButton');
+        this.colorButton = new ColorButton(toolbar.el);
+        this.colorButton.setIcon(svgs["text-color"]);
+        const ColorPicker = control.require('colorPicker');
+        this.colorPicker = new ColorPicker(this.colorButton.el);
+        this.colorButton.on('click', e => this.onClick(e));
+        this.colorPicker.on('change', color => this.onPickerChange(color));
+        editor.on('rangechange', this.onRangeChange.bind(this));
+    }
+    onClick(e) {
+        this.colorPicker.show(this.colorButton.getColor());
+        // this.editor.restoreSelection();
+        // document.execCommand('bold');
+    }
+    onPickerChange(rgb) {
+        console.log(rgb);
+        this.colorButton.setColor(rgb);
+        this.editor.restoreSelection();
+        document.execCommand('foreColor', false, rgb);
+    }
+    onRangeChange() {
+        // const isMatch = this.editor.match({
+        //   type: 'tagName',
+        //   value: 'B'
+        // })
+        // isMatch ? this.colo.setActive() : this.button.resetActive();
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (ForeColor);
 
 
 /***/ }),

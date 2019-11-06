@@ -7,6 +7,7 @@ import Button from '../controls/button';
 import Select from '../controls/select';
 import SelectButton from '../controls/selectButton';
 import SelectMenu from '../controls/selectMenu';
+import ColorButton from '../controls/colorButton';
 import ColorPicker from '../controls/colorPicker';
 
 class Control {
@@ -16,6 +17,7 @@ class Control {
     registry.registerControl('selectButton', SelectButton);
     registry.registerControl('selectMenu', SelectMenu);
     registry.registerControl('colorPicker', ColorPicker);
+    registry.registerControl('colorButton', ColorButton);
   }
 
   register(name: string, control) {

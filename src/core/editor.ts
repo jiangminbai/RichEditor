@@ -87,7 +87,7 @@ class Editor extends Emitter {
     const startContainer = range.startContainer;
     let node = startContainer;
     let nodeChain = []; // 点击位置往上搜集的节点链
-    while(node.nodeType === 3 || !node.classList.contains('richeditor_area')) {
+    while(node.nodeType === 3 || node !== this.el) {
       if (node.nodeType !== 3) nodeChain.push(node); // 排除text节点
       node = node.parentNode
     }

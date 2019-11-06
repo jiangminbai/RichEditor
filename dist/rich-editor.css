@@ -17,9 +17,6 @@
   box-sizing: border-box;
   margin: 4px 2px;
 }
-.richeditor_toolbarItem:hover > svg {
-  fill: #FF9800;
-}
 .richeditor_toolbarItem.active > svg {
   fill: #F44336;
 }
