@@ -22,8 +22,9 @@ class StrikeThrough {
   }
 
   onClick(){
-    this.editor.restoreSelection();
-    document.execCommand('strikeThrough');
+    // this.editor.restoreSelection();
+    // document.execCommand('strikeThrough');
+    this.editor.execCommand('strikeThrough');
   }
 
   onRangeChange() {

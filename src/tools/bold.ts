@@ -22,8 +22,9 @@ class Bold {
   }
 
   onClick(){
-    this.editor.restoreSelection();
-    document.execCommand('bold');
+    // this.editor.restoreSelection();
+    // document.execCommand('bold');
+    this.editor.execCommand('bold');
   }
 
   onRangeChange() {

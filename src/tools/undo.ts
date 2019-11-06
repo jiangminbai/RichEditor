@@ -22,8 +22,9 @@ class Undo {
   }
 
   onClick(){
-    document.execCommand('undo');
-    this.editor.fireRangeChange();
+    // document.execCommand('undo');
+    // this.editor.fireRangeChange();
+    this.editor.execCommand('undo');
   }
 }
 

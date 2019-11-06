@@ -30,16 +30,16 @@ class ForeColor {
   }
 
   onClick(e){
-    this.colorPicker.show(this.colorButton.getColor());
-    // this.editor.restoreSelection();
-    // document.execCommand('bold');
+    if (!this.colorPicker.visible)
+      this.colorPicker.show(this.colorButton.getColor());
+    else
+      this.colorPicker.hide();
   }
 
   onPickerChange(rgb: string) {
     console.log(rgb);
     this.colorButton.setColor(rgb);
-    this.editor.restoreSelection();
-    document.execCommand('foreColor',false, rgb);
+    this.editor.execCommand('foreColor',false, rgb);
   }
 
   onRangeChange() {

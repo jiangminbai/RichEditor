@@ -406,7 +406,8 @@ class RGBControl extends Emitter {
 
 // 颜色显示器
 class ColorDisplay extends Emitter {
-  el: HTMLElement;
+  public el: HTMLElement;
+  public rgb: any;
 
   constructor(container) {
     super();
@@ -415,9 +416,13 @@ class ColorDisplay extends Emitter {
     container.appendChild(this.el);
   }
 
-  update(rgb: string) {
+  public update(rgb: string) {
     this.el.style.background = rgb;
-    this.fire('change', rgb);
+    this.rgb = rgb;
+  }
+
+  public getRgb() {
+    return this.rgb;
   }
 }
 
@@ -476,6 +481,41 @@ class ColorSelect extends Emitter {
   }
 }
 
+// 拾取器的footer
+class PickerFooter extends Emitter {
+  el: HTMLElement;
+  confirm: HTMLElement;
+  cancel: HTMLElement;
+
+  constructor(container: HTMLElement) {
+    super();
+
+    this.createElement(container);
+    this.cancel.addEventListener('click', e => this.sendMessage(false));
+    this.confirm.addEventListener('click', e => this.sendMessage(true));
+  }
+
+  private createElement(container: HTMLElement) {
+    this.el = document.createElement('div');
+    this.el.className = 'rd_picker-footer';
+    container.appendChild(this.el);
+
+    this.cancel = document.createElement('button');
+    this.cancel.className = 'rd_picker-cancel';
+    this.cancel.textContent = '取消';
+    this.el.appendChild(this.cancel);
+
+    this.confirm = document.createElement('button');
+    this.confirm.className = 'rd_picker-confirm';
+    this.confirm.textContent = '确定';
+    this.el.appendChild(this.confirm);
+  }
+
+  sendMessage(isOk: boolean) {
+    this.fire('message', isOk);
+  }
+}
+
 // 颜色拾取器
 class ColorPicker extends Emitter {
   el: HTMLElement;
@@ -486,6 +526,7 @@ class ColorPicker extends Emitter {
   rgbControl: RGBControl;
   colorSelect: ColorSelect;
   visible: boolean = false;
+  pickerFooter: PickerFooter;
 
   constructor(element: HTMLElement) {
     super();
@@ -501,6 +542,7 @@ class ColorPicker extends Emitter {
     this.el.appendChild(this.box);
 
     this.colorSelect = new ColorSelect(this.el);
+    this.pickerFooter = new PickerFooter(this.el);
 
     this.hub.on('change', h => {
       this.palette.updateHub(h);
@@ -530,13 +572,27 @@ class ColorPicker extends Emitter {
       this.palette.updateRGB(color.r, color.g, color.b);
     })
 
-    this.colorDisplay.on('change', rgb => this.fire('change', rgb));
+    this.pickerFooter.on('message', isok => {
+      if (isok) {
+        this.fire('change', this.colorDisplay.getRgb());
+      }
+      this.hide();
+    })
 
+
+    // 根据点击元素定位
     const rect = element.getBoundingClientRect();
     this.el.style.top = rect.bottom + 'px';
     this.el.style.left = rect.left + 'px';
     this.el.style.display = 'none';
     document.body.appendChild(this.el);
+
+    document.body.addEventListener('click', (e: MouseEvent) => {
+      const target = <HTMLElement>e.target;
+      if (!this.el.contains(target) && this.el !== target && !element.contains(target) && element !== target) {
+        this.hide();
+      }
+    })
   }
 
   public show(rgb: string) {
@@ -549,6 +605,7 @@ class ColorPicker extends Emitter {
 
   public hide() {
     this.el.style.display = 'none';
+    this.visible = false;
   }
 }
 

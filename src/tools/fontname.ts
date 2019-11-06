@@ -39,8 +39,9 @@ class FontName {
   }
 
   onClick(item){
-    this.editor.restoreSelection();
-    document.execCommand('fontName', false, item.value);
+    // this.editor.restoreSelection();
+    // document.execCommand('fontName', false, item.value);
+    this.editor.execCommand('fontName', false, item.value);
   }
 
   onRangeChange() {

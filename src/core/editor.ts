@@ -33,7 +33,7 @@ class Editor extends Emitter {
   }
 
   // 使编辑器内部填充p标签
-  appendP() {
+  private appendP() {
     const p = document.createElement('p');
     const br = document.createElement('br');
     p.appendChild(br);
@@ -41,7 +41,7 @@ class Editor extends Emitter {
   }
 
   // 使编辑器内部始终存在一个p标签
-  handleLine(e) {
+  private handleLine(e) {
     if (e.keyCode === 8 && this.el.querySelectorAll('p').length === 0) {
       this.appendP()
     }
@@ -71,11 +71,23 @@ class Editor extends Emitter {
       this.currentSelection.removeAllRanges();
       this.currentSelection.addRange(this.currentRange);
       // 执行execCommand时，this.currentRange对象已经改变
-      setTimeout(() => {
-        this.currentRange = this.getRange();
-        this.fireRangeChange();
-      }, 0);
+      // setTimeout(() => {
+      //   this.currentRange = this.getRange();
+      //   this.fireRangeChange();
+      // }, 0);
     }
+  }
+
+  // 使用document.execCommand命令时，需要一些额外的操作
+  // 1.先focus文本编辑区
+  // 2.恢复选区范围对象
+  // 3.执行document.execCommand之后，选区对象中的范围对象被改变，需要重新保存范围对象
+  execCommand(commandName: string, showDefaultUI: boolean = false, value: string = null) {
+    // this.el.focus();
+    this.restoreSelection();
+    document.execCommand(commandName, showDefaultUI, value);
+    this.currentRange = this.getRange();
+    this.fireRangeChange();
   }
 
   // 选中选区是否与工具栏模式匹配

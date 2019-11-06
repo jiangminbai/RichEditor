@@ -22,8 +22,9 @@ class JustifyLeft {
   }
 
   onClick(){
-    this.editor.restoreSelection();
-    document.execCommand('JustifyLeft');
+    // this.editor.restoreSelection();
+    // document.execCommand('JustifyLeft');
+    this.editor.execCommand('JustifyLeft');
   }
 
   onRangeChange() {

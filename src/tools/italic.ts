@@ -23,8 +23,9 @@ class Italic {
   }
 
   onClick(){
-    this.editor.restoreSelection();
-    document.execCommand('italic');
+    // this.editor.restoreSelection();
+    // document.execCommand('italic');
+    this.editor.execCommand('italic');
   }
 
   onRangeChange() {

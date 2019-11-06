@@ -44,8 +44,9 @@ class UnorderedList {
   }
 
   onClick(){
-    this.editor.restoreSelection();
-    document.execCommand('insertUnorderedList');
+    // this.editor.restoreSelection();
+    // document.execCommand('insertUnorderedList');
+    this.editor.execCommand('insertUnorderedList');
   }
 
   onRangeChange() {

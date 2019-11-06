@@ -22,8 +22,9 @@ class JustifyCenter {
   }
 
   onClick(){
-    this.editor.restoreSelection();
-    document.execCommand('JustifyCenter');
+    // this.editor.restoreSelection();
+    // document.execCommand('JustifyCenter');
+    this.editor.execCommand('JustifyCenter');
   }
 
   onRangeChange() {

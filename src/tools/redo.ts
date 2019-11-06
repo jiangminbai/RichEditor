@@ -22,8 +22,9 @@ class Redo {
   }
 
   onClick(){
-    document.execCommand('redo');
-    this.editor.fireRangeChange();
+    // document.execCommand('redo');
+    // this.editor.fireRangeChange();
+    this.editor.execCommand('redo');
   }
 }
 

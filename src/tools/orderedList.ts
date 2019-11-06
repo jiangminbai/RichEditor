@@ -45,8 +45,9 @@ class OrderedList {
   }
 
   onClick(){
-    this.editor.restoreSelection();
-    document.execCommand('insertOrderedList');
+    // this.editor.restoreSelection();
+    // document.execCommand('insertOrderedList');
+    this.editor.execCommand('insertOrderedList');
   }
 
   onRangeChange() {

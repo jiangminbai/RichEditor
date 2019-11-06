@@ -23,8 +23,9 @@ class Underline {
   }
 
   onClick(){
-    this.editor.restoreSelection();
-    document.execCommand('underline');
+    // this.editor.restoreSelection();
+    // document.execCommand('underline');
+    this.editor.execCommand('underline');
   }
 
   onRangeChange() {

@@ -36,8 +36,9 @@ class FontSize {
   }
 
   onClick(item){
-    this.editor.restoreSelection();
-    document.execCommand('fontSize', false, item.value);
+    // this.editor.restoreSelection();
+    // document.execCommand('fontSize', false, item.value);
+    this.editor.execCommand('fontSize', false, item.value);
   }
 
   onRangeChange() {

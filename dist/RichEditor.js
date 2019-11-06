@@ -517,7 +517,10 @@ class ColorDisplay extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"]
     }
     update(rgb) {
         this.el.style.background = rgb;
-        this.fire('change', rgb);
+        this.rgb = rgb;
+    }
+    getRgb() {
+        return this.rgb;
     }
 }
 // 颜色选择列表
@@ -568,6 +571,31 @@ class ColorSelect extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
         ];
     }
 }
+// 拾取器的footer
+class PickerFooter extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] {
+    constructor(container) {
+        super();
+        this.createElement(container);
+        this.cancel.addEventListener('click', e => this.sendMessage(false));
+        this.confirm.addEventListener('click', e => this.sendMessage(true));
+    }
+    createElement(container) {
+        this.el = document.createElement('div');
+        this.el.className = 'rd_picker-footer';
+        container.appendChild(this.el);
+        this.cancel = document.createElement('button');
+        this.cancel.className = 'rd_picker-cancel';
+        this.cancel.textContent = '取消';
+        this.el.appendChild(this.cancel);
+        this.confirm = document.createElement('button');
+        this.confirm.className = 'rd_picker-confirm';
+        this.confirm.textContent = '确定';
+        this.el.appendChild(this.confirm);
+    }
+    sendMessage(isOk) {
+        this.fire('message', isOk);
+    }
+}
 // 颜色拾取器
 class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] {
     constructor(element) {
@@ -583,6 +611,7 @@ class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
         this.rgbControl = new RGBControl(this.box);
         this.el.appendChild(this.box);
         this.colorSelect = new ColorSelect(this.el);
+        this.pickerFooter = new PickerFooter(this.el);
         this.hub.on('change', h => {
             this.palette.updateHub(h);
         });
@@ -605,12 +634,24 @@ class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
         this.rgbControl.on('change', color => {
             this.palette.updateRGB(color.r, color.g, color.b);
         });
-        this.colorDisplay.on('change', rgb => this.fire('change', rgb));
+        this.pickerFooter.on('message', isok => {
+            if (isok) {
+                this.fire('change', this.colorDisplay.getRgb());
+            }
+            this.hide();
+        });
+        // 根据点击元素定位
         const rect = element.getBoundingClientRect();
         this.el.style.top = rect.bottom + 'px';
         this.el.style.left = rect.left + 'px';
         this.el.style.display = 'none';
         document.body.appendChild(this.el);
+        document.body.addEventListener('click', (e) => {
+            const target = e.target;
+            if (!this.el.contains(target) && this.el !== target && !element.contains(target) && element !== target) {
+                this.hide();
+            }
+        });
     }
     show(rgb) {
         this.visible = true;
@@ -620,6 +661,7 @@ class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
     }
     hide() {
         this.el.style.display = 'none';
+        this.visible = false;
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (ColorPicker);
@@ -936,11 +978,22 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
             this.currentSelection.removeAllRanges();
             this.currentSelection.addRange(this.currentRange);
             // 执行execCommand时，this.currentRange对象已经改变
-            setTimeout(() => {
-                this.currentRange = this.getRange();
-                this.fireRangeChange();
-            }, 0);
+            // setTimeout(() => {
+            //   this.currentRange = this.getRange();
+            //   this.fireRangeChange();
+            // }, 0);
         }
+    }
+    // 使用document.execCommand命令时，需要一些额外的操作
+    // 1.先focus文本编辑区
+    // 2.恢复选区范围对象
+    // 3.执行document.execCommand之后，选区对象中的范围对象被改变，需要重新保存范围对象
+    execCommand(commandName, showDefaultUI = false, value = null) {
+        // this.el.focus();
+        this.restoreSelection();
+        document.execCommand(commandName, showDefaultUI, value);
+        this.currentRange = this.getRange();
+        this.fireRangeChange();
     }
     // 选中选区是否与工具栏模式匹配
     match(matchPattern) {
@@ -1436,8 +1489,9 @@ class Bold {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick() {
-        this.editor.restoreSelection();
-        document.execCommand('bold');
+        // this.editor.restoreSelection();
+        // document.execCommand('bold');
+        this.editor.execCommand('bold');
     }
     onRangeChange() {
         const isMatch = this.editor.match({
@@ -1484,8 +1538,9 @@ class FontName {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick(item) {
-        this.editor.restoreSelection();
-        document.execCommand('fontName', false, item.value);
+        // this.editor.restoreSelection();
+        // document.execCommand('fontName', false, item.value);
+        this.editor.execCommand('fontName', false, item.value);
     }
     onRangeChange() {
         var values = this.options.map(item => item.value);
@@ -1538,8 +1593,9 @@ class FontSize {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick(item) {
-        this.editor.restoreSelection();
-        document.execCommand('fontSize', false, item.value);
+        // this.editor.restoreSelection();
+        // document.execCommand('fontSize', false, item.value);
+        this.editor.execCommand('fontSize', false, item.value);
     }
     onRangeChange() {
         const size = this.editor.match({
@@ -1585,15 +1641,15 @@ class ForeColor {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick(e) {
-        this.colorPicker.show(this.colorButton.getColor());
-        // this.editor.restoreSelection();
-        // document.execCommand('bold');
+        if (!this.colorPicker.visible)
+            this.colorPicker.show(this.colorButton.getColor());
+        else
+            this.colorPicker.hide();
     }
     onPickerChange(rgb) {
         console.log(rgb);
         this.colorButton.setColor(rgb);
-        this.editor.restoreSelection();
-        document.execCommand('foreColor', false, rgb);
+        this.editor.execCommand('foreColor', false, rgb);
     }
     onRangeChange() {
         // const isMatch = this.editor.match({
@@ -1631,8 +1687,9 @@ class Italic {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick() {
-        this.editor.restoreSelection();
-        document.execCommand('italic');
+        // this.editor.restoreSelection();
+        // document.execCommand('italic');
+        this.editor.execCommand('italic');
     }
     onRangeChange() {
         const isMatch = this.editor.match({
@@ -1667,8 +1724,9 @@ class JustifyCenter {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick() {
-        this.editor.restoreSelection();
-        document.execCommand('JustifyCenter');
+        // this.editor.restoreSelection();
+        // document.execCommand('JustifyCenter');
+        this.editor.execCommand('JustifyCenter');
     }
     onRangeChange() {
         const isMatch = this.editor.match({
@@ -1705,8 +1763,9 @@ class JustifyLeft {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick() {
-        this.editor.restoreSelection();
-        document.execCommand('JustifyLeft');
+        // this.editor.restoreSelection();
+        // document.execCommand('JustifyLeft');
+        this.editor.execCommand('JustifyLeft');
     }
     onRangeChange() {
         const isMatch = this.editor.match({
@@ -1743,8 +1802,9 @@ class JustifyRight {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick() {
-        this.editor.restoreSelection();
-        document.execCommand('JustifyRight');
+        // this.editor.restoreSelection();
+        // document.execCommand('JustifyRight');
+        this.editor.execCommand('JustifyRight');
     }
     onRangeChange() {
         const isMatch = this.editor.match({
@@ -1784,8 +1844,9 @@ class OrderedList {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick() {
-        this.editor.restoreSelection();
-        document.execCommand('insertOrderedList');
+        // this.editor.restoreSelection();
+        // document.execCommand('insertOrderedList');
+        this.editor.execCommand('insertOrderedList');
     }
     onRangeChange() {
         const isMatch = this.editor.match({
@@ -1822,8 +1883,9 @@ class Redo {
         this.button.on('click', this.onClick.bind(this));
     }
     onClick() {
-        document.execCommand('redo');
-        this.editor.fireRangeChange();
+        // document.execCommand('redo');
+        // this.editor.fireRangeChange();
+        this.editor.execCommand('redo');
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Redo);
@@ -1851,8 +1913,9 @@ class StrikeThrough {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick() {
-        this.editor.restoreSelection();
-        document.execCommand('strikeThrough');
+        // this.editor.restoreSelection();
+        // document.execCommand('strikeThrough');
+        this.editor.execCommand('strikeThrough');
     }
     onRangeChange() {
         const isMatch = this.editor.match({
@@ -1890,8 +1953,9 @@ class Underline {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick() {
-        this.editor.restoreSelection();
-        document.execCommand('underline');
+        // this.editor.restoreSelection();
+        // document.execCommand('underline');
+        this.editor.execCommand('underline');
     }
     onRangeChange() {
         const isMatch = this.editor.match({
@@ -1928,8 +1992,9 @@ class Undo {
         this.button.on('click', this.onClick.bind(this));
     }
     onClick() {
-        document.execCommand('undo');
-        this.editor.fireRangeChange();
+        // document.execCommand('undo');
+        // this.editor.fireRangeChange();
+        this.editor.execCommand('undo');
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Undo);
@@ -1960,8 +2025,9 @@ class UnorderedList {
         editor.on('rangechange', this.onRangeChange.bind(this));
     }
     onClick() {
-        this.editor.restoreSelection();
-        document.execCommand('insertUnorderedList');
+        // this.editor.restoreSelection();
+        // document.execCommand('insertUnorderedList');
+        this.editor.execCommand('insertUnorderedList');
     }
     onRangeChange() {
         const isMatch = this.editor.match({
