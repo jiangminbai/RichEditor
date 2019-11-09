@@ -2,6 +2,7 @@
  * 编辑器区域类
  */
 import Emitter from './emitter';
+import command from './command';
 
 interface MatchPattern {
   type: string, // 可选值'tagName' | 'style' | 'tagNameAttribute',
@@ -94,10 +95,11 @@ class Editor extends Emitter {
   // 1.先focus文本编辑区
   // 2.恢复选区范围对象
   // 3.执行document.execCommand之后，选区对象中的范围对象被改变，需要重新保存范围对象
-  public execCommand(commandName: string, showDefaultUI: boolean = false, value: string = null) {
+  public execCommand(commandName: string, showDefaultUI: boolean = false, ...args: string[]) {
     this.el.focus();
     this.restoreSelection();
-    document.execCommand(commandName, showDefaultUI, value);
+    command(this, commandName, showDefaultUI, ...args);
+    // document.execCommand(commandName, showDefaultUI, value);
     this.range = this.selection.getRangeAt(0);
     this.fireRangeChange();
   }

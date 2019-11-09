@@ -741,14 +741,14 @@ class Dialog extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         close.addEventListener('click', (e) => this.close());
     }
     createFooter() {
-        this.confirmBtn = document.createElement('button');
-        this.confirmBtn.className = 'rd_dialog-confirm-btn';
-        this.confirmBtn.textContent = '确认';
-        this.footer.appendChild(this.confirmBtn);
         this.cancelBtn = document.createElement('button');
         this.cancelBtn.className = 'rd_dialog-cancel-btn';
         this.cancelBtn.textContent = '取消';
         this.footer.appendChild(this.cancelBtn);
+        this.confirmBtn = document.createElement('button');
+        this.confirmBtn.className = 'rd_dialog-confirm-btn';
+        this.confirmBtn.textContent = '确认';
+        this.footer.appendChild(this.confirmBtn);
         this.cancelBtn.addEventListener('click', (e) => this.close());
     }
     close() {
@@ -1011,6 +1011,39 @@ class SelectMenu extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
+/***/ "./src/core/command.ts":
+/*!*****************************!*\
+  !*** ./src/core/command.ts ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function (editor, commandName, showDefaultUI, ...args) {
+    if (commandName === 'link') {
+        const startContainer = editor.range.startContainer;
+        const parentNode = startContainer.parentNode;
+        if (parentNode.tagName === 'A') {
+            parentNode.setAttribute('href', args[0]);
+            parentNode.setAttribute('title', args[2]);
+            parentNode.textContent = args[1];
+        }
+        else {
+            const a = document.createElement('a');
+            a.setAttribute('href', args[0]);
+            a.setAttribute('title', args[2]);
+            a.textContent = args[1];
+            parentNode.insertBefore(a, startContainer);
+        }
+        return;
+    }
+    document.execCommand(commandName, showDefaultUI, args[0]);
+});
+
+
+/***/ }),
+
 /***/ "./src/core/control.ts":
 /*!*****************************!*\
   !*** ./src/core/control.ts ***!
@@ -1071,9 +1104,11 @@ class Control {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _emitter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./emitter */ "./src/core/emitter.ts");
+/* harmony import */ var _command__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./command */ "./src/core/command.ts");
 /**
  * 编辑器区域类
  */
+
 
 class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor(container) {
@@ -1146,10 +1181,11 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
     // 1.先focus文本编辑区
     // 2.恢复选区范围对象
     // 3.执行document.execCommand之后，选区对象中的范围对象被改变，需要重新保存范围对象
-    execCommand(commandName, showDefaultUI = false, value = null) {
+    execCommand(commandName, showDefaultUI = false, ...args) {
         this.el.focus();
         this.restoreSelection();
-        document.execCommand(commandName, showDefaultUI, value);
+        Object(_command__WEBPACK_IMPORTED_MODULE_1__["default"])(this, commandName, showDefaultUI, ...args);
+        // document.execCommand(commandName, showDefaultUI, value);
         this.range = this.selection.getRangeAt(0);
         this.fireRangeChange();
     }
@@ -2042,6 +2078,7 @@ class Link {
         this.linkDialog.open();
     }
     insertHref(href, text, title) {
+        this.editor.execCommand('link', false, href, text, title);
     }
     onRangeChange() {
     }

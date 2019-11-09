@@ -8,12 +8,12 @@ export default function(editor: Editor, commandName: string, showDefaultUI: bool
     const startContainer = editor.range.startContainer;
     const parentNode = (<HTMLElement>startContainer.parentNode);
     if (parentNode.tagName === 'A') {
-      parentNode.setAttribute('url', args[0]);
+      parentNode.setAttribute('href', args[0]);
       parentNode.setAttribute('title', args[2]);
       parentNode.textContent = args[1];
     } else {
       const a = document.createElement('a');
-      a.setAttribute('url', args[0]);
+      a.setAttribute('href', args[0]);
       a.setAttribute('title', args[2]);
       a.textContent = args[1];
       parentNode.insertBefore(a, startContainer);

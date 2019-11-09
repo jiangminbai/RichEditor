@@ -74,15 +74,15 @@ class Dialog extends Emitter {
   }
 
   public createFooter() {
-    this.confirmBtn = document.createElement('button');
-    this.confirmBtn.className = 'rd_dialog-confirm-btn';
-    this.confirmBtn.textContent = '确认';
-    this.footer.appendChild(this.confirmBtn);
-
     this.cancelBtn = document.createElement('button');
     this.cancelBtn.className = 'rd_dialog-cancel-btn';
     this.cancelBtn.textContent = '取消';
     this.footer.appendChild(this.cancelBtn);
+
+    this.confirmBtn = document.createElement('button');
+    this.confirmBtn.className = 'rd_dialog-confirm-btn';
+    this.confirmBtn.textContent = '确认';
+    this.footer.appendChild(this.confirmBtn);
 
     this.cancelBtn.addEventListener('click', (e: MouseEvent) => this.close());
   }
