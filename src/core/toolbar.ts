@@ -19,6 +19,7 @@ import FontSize from '../tools/fontsize';
 import FontName from '../tools/fontname';
 import ForeColor from '../tools/foreColor';
 import TextBgColor from '../tools/textBgColor';
+import Link from '../tools/link';
 
 class Toolbar {
   el: HTMLElement;
@@ -91,6 +92,10 @@ class Toolbar {
       {
         name: 'text-bg-color',
         module: new TextBgColor()
+      },
+      {
+        name: 'link',
+        module: new Link()
       }
     ]
 

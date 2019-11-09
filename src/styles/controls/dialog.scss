@@ -1,0 +1,76 @@
+.rd_dialog {
+  position: fixed;
+  width: 200px;
+  font-size: 14px;
+  background: #fff;
+  padding: 10px;
+  box-shadow: 0 0 6px rgba(66, 66, 66, 0.5);
+}
+
+.rd_dialog-header {
+  position: relative;
+  height: 30px;
+  line-height: 30px;
+}
+
+.rd_dialog-close {
+  position: absolute;
+  right: 0;
+  top: 3px;
+  width: 24px;
+  height: 24px;
+  outline: none;
+  padding: 0;
+  cursor: pointer;
+  border: 0;
+}
+
+.rd_dialog-title {
+  margin: 0;
+}
+
+.rd_dialog-footer {
+  text-align: right;
+  padding-top: 10px;
+  border-top: 2px solid #000;
+
+  button {
+    outline: none;
+    border: 2px solid #000;
+    padding: 1px 8px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+}
+
+.rd_dialog-content {
+  margin-top: 10px;
+}
+
+.rd_form-group {
+  margin-bottom: 15px;
+
+  .rd_form-label {
+    display: block;
+  }
+
+  .rd_form-input {
+    border: 0;
+    border: 1px solid #000;
+    outline: none;
+    padding: 4px 8px;
+    font-size: 14px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+
+    &::-webkit-input-placeholder {
+      color: #ccc;
+    }
+
+    &:focus {
+      border-color: #F44336;
+    }
+  }
+}
+

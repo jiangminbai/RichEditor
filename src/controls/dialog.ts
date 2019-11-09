@@ -19,17 +19,23 @@ class Dialog extends Emitter {
   public options: DialogOptions;
   public visible: boolean = false;
 
-  constructor(options: DialogOptions) {
+  constructor(element:HTMLElement, options: DialogOptions) {
     super();
 
     this.options = Object.assign({}, options);
 
-    this.createSkeleton();
+    this.createSkeleton(element);
     this.createHeader();
     this.createFooter();
+
+    const bounding = element.getBoundingClientRect();
+    this.el.style.left = bounding.left + 'px';
+    this.el.style.top = bounding.bottom + 'px';
+
+    document.body.appendChild(this.el);
   }
 
-  public createSkeleton() {
+  public createSkeleton(element: HTMLElement) {
     this.el = document.createElement('div');
     this.el.className = 'rd_dialog';
     this.el.style.display = 'none';
@@ -47,7 +53,9 @@ class Dialog extends Emitter {
     this.el.appendChild(this.footer);
 
     document.body.addEventListener('click', (e: MouseEvent) => {
-      if (!this.el.contains(<HTMLElement>e.target)) this.close();
+      if (!this.el.contains(<HTMLElement>e.target) && this.el !== e.target && !element.contains(<HTMLElement>e.target) && element !== e.target) {
+        this.close();
+      }
     })
   }
 
@@ -60,6 +68,7 @@ class Dialog extends Emitter {
     const close = document.createElement('button');
     close.className = 'rd_dialog-close';
     close.innerHTML = svgs.close;
+    this.header.appendChild(close);
 
     close.addEventListener('click', (e: MouseEvent) => this.close());
   }
@@ -67,10 +76,12 @@ class Dialog extends Emitter {
   public createFooter() {
     this.confirmBtn = document.createElement('button');
     this.confirmBtn.className = 'rd_dialog-confirm-btn';
+    this.confirmBtn.textContent = '确认';
     this.footer.appendChild(this.confirmBtn);
 
     this.cancelBtn = document.createElement('button');
     this.cancelBtn.className = 'rd_dialog-cancel-btn';
+    this.cancelBtn.textContent = '取消';
     this.footer.appendChild(this.cancelBtn);
 
     this.cancelBtn.addEventListener('click', (e: MouseEvent) => this.close());

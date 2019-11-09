@@ -13,8 +13,8 @@ interface MatchPattern {
 
 class Editor extends Emitter {
   el: HTMLElement;
-  currentSelection: Selection;
-  currentRange: Range;
+  selection: Selection = null;
+  range: Range = null;
 
   constructor(container: HTMLElement) {
     super();
@@ -23,14 +23,12 @@ class Editor extends Emitter {
     this.el.className = 'richeditor_area';
     this.el.setAttribute('contenteditable', 'true');
     container.appendChild(this.el);
-
-    this.currentSelection = window.getSelection();
     this.appendP();
 
-    this.el.addEventListener('mouseup', this.fireRangeChange.bind(this));
-    this.el.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
-    this.el.addEventListener('keyup', this.handleLine.bind(this)); // 使用keyup监听，使用keydown的话函数执行会超前一步
-    // event.on('restorerange', this.restoreRange.bind(this));
+    this.saveSelection();
+    // this.el.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+    // 使用keyup监听，使用keydown的话函数执行会超前一步
+    this.el.addEventListener('keyup', this.handleLine.bind(this));
   }
 
   // 使编辑器内部填充p标签
@@ -48,34 +46,47 @@ class Editor extends Emitter {
     }
   }
 
-  // 当执行document.execCommand时，Selection.getRangeAt(0)中的range对象会被覆盖掉
-  getRange(): any {
-    return this.currentSelection.rangeCount ? this.currentSelection.getRangeAt(0): null;
+  // 通过mouseup和selectionchange事件将最后的选区范围对象保存在编辑器中
+  private saveSelection() {
+    this.selection = window.getSelection();
+
+    this.el.addEventListener('mouseup', () => {
+      this.range = this.selection.getRangeAt(0);
+    });
+
+    document.addEventListener('selectionchange', () => {
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return;
+      const range = selection.getRangeAt(0);
+      if (!this.el.contains(range.startContainer)) return;
+      this.range = range;
+      this.fireRangeChange();
+    })
   }
 
+  // 当执行document.execCommand时，Selection.getRangeAt(0)中的range对象会被覆盖掉
+  // getRange(): any {
+  //   return this.selection.rangeCount ? this.selection.getRangeAt(0): null;
+  // }
+
   // 选区范围对象发生变化
-  fireRangeChange() {
-    this.fire('rangechange', this.getRange());
+  private fireRangeChange() {
+    this.fire('rangechange', this.range);
   }
 
   // 当鼠标离开编辑区域时，为了恢复选区而保存选区范围对象
-  handleMouseLeave() {
-    if (this.currentSelection && this.currentSelection.rangeCount) {
-      this.currentRange = this.currentSelection.getRangeAt(0);
-    }
-  }
+  // handleMouseLeave() {
+  //   if (this.selection && this.selection.rangeCount) {
+  //     this.range = this.selection.getRangeAt(0);
+  //   }
+  // }
 
   // 恢复选区
   // 当点击toolbar时，编辑区会失去焦点, range对象无法通过selection.getRangeAt(0)获取
-  restoreSelection() {
-    if (this.currentRange) {
-      this.currentSelection.removeAllRanges();
-      this.currentSelection.addRange(this.currentRange);
-      // 执行execCommand时，this.currentRange对象已经改变
-      // setTimeout(() => {
-      //   this.currentRange = this.getRange();
-      //   this.fireRangeChange();
-      // }, 0);
+  public restoreSelection() {
+    if (this.range) {
+      this.selection.removeAllRanges();
+      this.selection.addRange(this.range);
     }
   }
 
@@ -83,17 +94,17 @@ class Editor extends Emitter {
   // 1.先focus文本编辑区
   // 2.恢复选区范围对象
   // 3.执行document.execCommand之后，选区对象中的范围对象被改变，需要重新保存范围对象
-  execCommand(commandName: string, showDefaultUI: boolean = false, value: string = null) {
+  public execCommand(commandName: string, showDefaultUI: boolean = false, value: string = null) {
     this.el.focus();
     this.restoreSelection();
     document.execCommand(commandName, showDefaultUI, value);
-    this.currentRange = this.getRange();
+    this.range = this.selection.getRangeAt(0);
     this.fireRangeChange();
   }
 
   // 选中选区是否与工具栏模式匹配
-  match(matchPattern: MatchPattern): any {
-    const range = this.getRange();
+  public match(matchPattern: MatchPattern): any {
+    const range = this.range;
     if (!range) return false;
     
     // 获取节点链

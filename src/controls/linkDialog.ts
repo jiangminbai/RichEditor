@@ -13,12 +13,13 @@ class LinkDialog extends Dialog {
   text: HTMLInputElement;
   title: HTMLInputElement;
 
-  constructor(options: DialogOptions) {
-    super(options);
+  constructor(element:HTMLElement, options: DialogOptions) {
+    super(element, options);
 
     this.createContent();
     this.confirmBtn.addEventListener('click', (e: MouseEvent) => {
       this.fire('confirm', this.href.value, this.text.value, this.title.value);
+      this.close();
     })
   }
 
@@ -26,16 +27,13 @@ class LinkDialog extends Dialog {
     const content =
     `
     <div class="rd_form-group">
-      <label class="rd_form-label">链接地址</label>
-      <input class="rd_form-input rd_form-href" />
+      <input class="rd_form-input rd_form-href" placeholder="链接地址" />
     </div>
     <div class="rd_form-group">
-      <label class="rd_form-label">显示文字</label>
-      <input class="rd_form-input rd_form-text" />
+      <input class="rd_form-input rd_form-text" placeholder="显示文字" />
     </div>
     <div class="rd_form-group">
-      <label class="rd_form-label">标题</label>
-      <input class="rd_form-input rd_form-title" />
+      <input class="rd_form-input rd_form-title" placeholder="标题" />
     </div>
     `
     this.content.innerHTML = content;
@@ -44,3 +42,5 @@ class LinkDialog extends Dialog {
     this.title = this.content.querySelector('.rd_form-title');
   }
 }
+
+export default LinkDialog;

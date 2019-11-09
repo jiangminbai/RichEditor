@@ -3,12 +3,14 @@
  */
 
 import registry from './registry';
+
 import Button from '../controls/button';
 import Select from '../controls/select';
 import SelectButton from '../controls/selectButton';
 import SelectMenu from '../controls/selectMenu';
 import ColorButton from '../controls/colorButton';
 import ColorPicker from '../controls/colorPicker';
+import LinkDialog from '../controls/linkDialog';
 
 class Control {
   constructor() {
@@ -18,6 +20,7 @@ class Control {
     registry.registerControl('selectMenu', SelectMenu);
     registry.registerControl('colorPicker', ColorPicker);
     registry.registerControl('colorButton', ColorButton);
+    registry.registerControl('linkDialog', LinkDialog);
   }
 
   register(name: string, control) {

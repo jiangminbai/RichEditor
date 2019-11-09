@@ -681,6 +681,136 @@ class ColorPicker extends _core_emitter__WEBPACK_IMPORTED_MODULE_1__["default"] 
 
 /***/ }),
 
+/***/ "./src/controls/dialog.ts":
+/*!********************************!*\
+  !*** ./src/controls/dialog.ts ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_emitter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/emitter */ "./src/core/emitter.ts");
+/* harmony import */ var _core_svgs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/svgs */ "./src/core/svgs.ts");
+/**
+ * 弹窗基类
+ */
+
+
+class Dialog extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor(element, options) {
+        super();
+        this.visible = false;
+        this.options = Object.assign({}, options);
+        this.createSkeleton(element);
+        this.createHeader();
+        this.createFooter();
+        const bounding = element.getBoundingClientRect();
+        this.el.style.left = bounding.left + 'px';
+        this.el.style.top = bounding.bottom + 'px';
+        document.body.appendChild(this.el);
+    }
+    createSkeleton(element) {
+        this.el = document.createElement('div');
+        this.el.className = 'rd_dialog';
+        this.el.style.display = 'none';
+        this.header = document.createElement('div');
+        this.header.className = 'rd_dialog-header';
+        this.el.appendChild(this.header);
+        this.content = document.createElement('div');
+        this.content.className = 'rd_dialog-content';
+        this.el.appendChild(this.content);
+        this.footer = document.createElement('div');
+        this.footer.className = 'rd_dialog-footer';
+        this.el.appendChild(this.footer);
+        document.body.addEventListener('click', (e) => {
+            if (!this.el.contains(e.target) && this.el !== e.target && !element.contains(e.target) && element !== e.target) {
+                this.close();
+            }
+        });
+    }
+    createHeader() {
+        const title = document.createElement('p');
+        title.className = 'rd_dialog-title';
+        title.textContent = this.options.title;
+        this.header.appendChild(title);
+        const close = document.createElement('button');
+        close.className = 'rd_dialog-close';
+        close.innerHTML = _core_svgs__WEBPACK_IMPORTED_MODULE_1__["default"].close;
+        this.header.appendChild(close);
+        close.addEventListener('click', (e) => this.close());
+    }
+    createFooter() {
+        this.confirmBtn = document.createElement('button');
+        this.confirmBtn.className = 'rd_dialog-confirm-btn';
+        this.confirmBtn.textContent = '确认';
+        this.footer.appendChild(this.confirmBtn);
+        this.cancelBtn = document.createElement('button');
+        this.cancelBtn.className = 'rd_dialog-cancel-btn';
+        this.cancelBtn.textContent = '取消';
+        this.footer.appendChild(this.cancelBtn);
+        this.cancelBtn.addEventListener('click', (e) => this.close());
+    }
+    close() {
+        this.el.style.display = 'none';
+        this.visible = false;
+    }
+    open() {
+        this.el.style.display = 'block';
+        this.visible = true;
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (Dialog);
+
+
+/***/ }),
+
+/***/ "./src/controls/linkDialog.ts":
+/*!************************************!*\
+  !*** ./src/controls/linkDialog.ts ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _dialog__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dialog */ "./src/controls/dialog.ts");
+/**
+ * 链接弹窗
+ */
+
+class LinkDialog extends _dialog__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor(element, options) {
+        super(element, options);
+        this.createContent();
+        this.confirmBtn.addEventListener('click', (e) => {
+            this.fire('confirm', this.href.value, this.text.value, this.title.value);
+            this.close();
+        });
+    }
+    createContent() {
+        const content = `
+    <div class="rd_form-group">
+      <input class="rd_form-input rd_form-href" placeholder="链接地址" />
+    </div>
+    <div class="rd_form-group">
+      <input class="rd_form-input rd_form-text" placeholder="显示文字" />
+    </div>
+    <div class="rd_form-group">
+      <input class="rd_form-input rd_form-title" placeholder="标题" />
+    </div>
+    `;
+        this.content.innerHTML = content;
+        this.href = this.content.querySelector('.rd_form-href');
+        this.text = this.content.querySelector('.rd_form-text');
+        this.title = this.content.querySelector('.rd_form-title');
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (LinkDialog);
+
+
+/***/ }),
+
 /***/ "./src/controls/select.ts":
 /*!********************************!*\
   !*** ./src/controls/select.ts ***!
@@ -897,9 +1027,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _controls_selectMenu__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../controls/selectMenu */ "./src/controls/selectMenu.ts");
 /* harmony import */ var _controls_colorButton__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../controls/colorButton */ "./src/controls/colorButton.ts");
 /* harmony import */ var _controls_colorPicker__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../controls/colorPicker */ "./src/controls/colorPicker.ts");
+/* harmony import */ var _controls_linkDialog__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../controls/linkDialog */ "./src/controls/linkDialog.ts");
 /**
  * 控件管理类
  */
+
 
 
 
@@ -915,6 +1047,7 @@ class Control {
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('selectMenu', _controls_selectMenu__WEBPACK_IMPORTED_MODULE_4__["default"]);
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('colorPicker', _controls_colorPicker__WEBPACK_IMPORTED_MODULE_6__["default"]);
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('colorButton', _controls_colorButton__WEBPACK_IMPORTED_MODULE_5__["default"]);
+        _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('linkDialog', _controls_linkDialog__WEBPACK_IMPORTED_MODULE_7__["default"]);
     }
     register(name, control) {
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl(name, control);
@@ -945,16 +1078,17 @@ __webpack_require__.r(__webpack_exports__);
 class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor(container) {
         super();
+        this.selection = null;
+        this.range = null;
         this.el = document.createElement('div');
         this.el.className = 'richeditor_area';
         this.el.setAttribute('contenteditable', 'true');
         container.appendChild(this.el);
-        this.currentSelection = window.getSelection();
         this.appendP();
-        this.el.addEventListener('mouseup', this.fireRangeChange.bind(this));
-        this.el.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
-        this.el.addEventListener('keyup', this.handleLine.bind(this)); // 使用keyup监听，使用keydown的话函数执行会超前一步
-        // event.on('restorerange', this.restoreRange.bind(this));
+        this.saveSelection();
+        // this.el.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+        // 使用keyup监听，使用keydown的话函数执行会超前一步
+        this.el.addEventListener('keyup', this.handleLine.bind(this));
     }
     // 使编辑器内部填充p标签
     appendP() {
@@ -969,31 +1103,43 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
             this.appendP();
         }
     }
-    // 当执行document.execCommand时，Selection.getRangeAt(0)中的range对象会被覆盖掉
-    getRange() {
-        return this.currentSelection.rangeCount ? this.currentSelection.getRangeAt(0) : null;
+    // 通过mouseup和selectionchange事件将最后的选区范围对象保存在编辑器中
+    saveSelection() {
+        this.selection = window.getSelection();
+        this.el.addEventListener('mouseup', () => {
+            this.range = this.selection.getRangeAt(0);
+        });
+        document.addEventListener('selectionchange', () => {
+            const selection = window.getSelection();
+            if (!selection.rangeCount)
+                return;
+            const range = selection.getRangeAt(0);
+            if (!this.el.contains(range.startContainer))
+                return;
+            this.range = range;
+            this.fireRangeChange();
+        });
     }
+    // 当执行document.execCommand时，Selection.getRangeAt(0)中的range对象会被覆盖掉
+    // getRange(): any {
+    //   return this.selection.rangeCount ? this.selection.getRangeAt(0): null;
+    // }
     // 选区范围对象发生变化
     fireRangeChange() {
-        this.fire('rangechange', this.getRange());
+        this.fire('rangechange', this.range);
     }
     // 当鼠标离开编辑区域时，为了恢复选区而保存选区范围对象
-    handleMouseLeave() {
-        if (this.currentSelection && this.currentSelection.rangeCount) {
-            this.currentRange = this.currentSelection.getRangeAt(0);
-        }
-    }
+    // handleMouseLeave() {
+    //   if (this.selection && this.selection.rangeCount) {
+    //     this.range = this.selection.getRangeAt(0);
+    //   }
+    // }
     // 恢复选区
     // 当点击toolbar时，编辑区会失去焦点, range对象无法通过selection.getRangeAt(0)获取
     restoreSelection() {
-        if (this.currentRange) {
-            this.currentSelection.removeAllRanges();
-            this.currentSelection.addRange(this.currentRange);
-            // 执行execCommand时，this.currentRange对象已经改变
-            // setTimeout(() => {
-            //   this.currentRange = this.getRange();
-            //   this.fireRangeChange();
-            // }, 0);
+        if (this.range) {
+            this.selection.removeAllRanges();
+            this.selection.addRange(this.range);
         }
     }
     // 使用document.execCommand命令时，需要一些额外的操作
@@ -1004,12 +1150,12 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.el.focus();
         this.restoreSelection();
         document.execCommand(commandName, showDefaultUI, value);
-        this.currentRange = this.getRange();
+        this.range = this.selection.getRangeAt(0);
         this.fireRangeChange();
     }
     // 选中选区是否与工具栏模式匹配
     match(matchPattern) {
-        const range = this.getRange();
+        const range = this.range;
         if (!range)
             return false;
         // 获取节点链
@@ -1396,9 +1542,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tools_fontname__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../tools/fontname */ "./src/tools/fontname.ts");
 /* harmony import */ var _tools_foreColor__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../tools/foreColor */ "./src/tools/foreColor.ts");
 /* harmony import */ var _tools_textBgColor__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../tools/textBgColor */ "./src/tools/textBgColor.ts");
+/* harmony import */ var _tools_link__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../tools/link */ "./src/tools/link.ts");
 /**
  * 工具栏类
  */
+
 
 
 
@@ -1483,6 +1631,10 @@ class Toolbar {
             {
                 name: 'text-bg-color',
                 module: new _tools_textBgColor__WEBPACK_IMPORTED_MODULE_15__["default"]()
+            },
+            {
+                name: 'link',
+                module: new _tools_link__WEBPACK_IMPORTED_MODULE_16__["default"]()
             }
         ];
         plugins.forEach(plugin => {
@@ -1856,6 +2008,45 @@ class JustifyRight {
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (JustifyRight);
+
+
+/***/ }),
+
+/***/ "./src/tools/link.ts":
+/*!***************************!*\
+  !*** ./src/tools/link.ts ***!
+  \***************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class Link {
+    install(context) {
+        const { editor, svgs, toolbar, control } = context;
+        this.editor = editor;
+        const Button = control.require('button');
+        this.button = new Button(toolbar.el);
+        this.button.setIcon(svgs.link);
+        this.button.on('click', (e) => this.onClick(e));
+        const LinkDialog = control.require('linkDialog');
+        this.linkDialog = new LinkDialog(this.button.el, {
+            title: '链接'
+        });
+        this.linkDialog.on('confirm', (href, text, title) => this.insertHref(href, text, title));
+        editor.on('rangechange', this.onRangeChange.bind(this));
+    }
+    onClick(e) {
+        if (this.linkDialog.visible)
+            return this.linkDialog.close();
+        this.linkDialog.open();
+    }
+    insertHref(href, text, title) {
+    }
+    onRangeChange() {
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (Link);
 
 
 /***/ }),
