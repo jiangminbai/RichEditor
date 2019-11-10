@@ -765,6 +765,65 @@ class Dialog extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
+/***/ "./src/controls/imageDialog.ts":
+/*!*************************************!*\
+  !*** ./src/controls/imageDialog.ts ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _dialog__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dialog */ "./src/controls/dialog.ts");
+/* harmony import */ var _tab__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tab */ "./src/controls/tab.ts");
+/**
+ * 图片弹窗
+ */
+
+
+class ImageDialog extends _dialog__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor(element, options) {
+        super(element, options);
+        this.tab = new _tab__WEBPACK_IMPORTED_MODULE_1__["default"](this.content);
+        this.createNetImageContent();
+        this.tab.appendChild({ title: '网络图片', content: this.netImageContent });
+        this.createLocalImageContent();
+        this.tab.appendChild({ title: '本地图片', content: this.localImageContent });
+        this.confirmBtn.addEventListener('click', (e) => {
+            this.fire('confirm', this.url.value, this.alt.value);
+            this.close();
+        });
+    }
+    createNetImageContent() {
+        this.netImageContent = document.createElement('div');
+        this.netImageContent.className = 'rd_imagedialog-net';
+        const form = `
+    <div class="rd_form-group">
+      <input class="rd_form-input rd_form-url" placeholder="链接地址" />
+    </div>
+    <div class="rd_form-group">
+      <input class="rd_form-input rd_form-alt" placeholder="图片描述" />
+    </div>
+    `;
+        this.netImageContent.innerHTML = form;
+        this.url = this.netImageContent.querySelector('.rd_form-url');
+        this.alt = this.netImageContent.querySelector('.rd_form-alt');
+    }
+    createLocalImageContent() {
+        this.localImageContent = document.createElement('div');
+        this.localImageContent.className = 'rd_imagedialog-local';
+    }
+    setValue(href, text, title) {
+        // this.href.value = href;
+        // this.text.value = text;
+        // this.title.value = title;
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (ImageDialog);
+
+
+/***/ }),
+
 /***/ "./src/controls/linkDialog.ts":
 /*!************************************!*\
   !*** ./src/controls/linkDialog.ts ***!
@@ -1016,6 +1075,77 @@ class SelectMenu extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
+/***/ "./src/controls/tab.ts":
+/*!*****************************!*\
+  !*** ./src/controls/tab.ts ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_emitter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/emitter */ "./src/core/emitter.ts");
+/**
+ * tab 切换控件
+ */
+
+class Tab extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor(container) {
+        super();
+        this.createElement(container);
+        this.header.addEventListener('click', (e) => this.onHeaderClick(e));
+    }
+    createElement(container) {
+        this.el = document.createElement('div');
+        this.el.className = 'rd_tab';
+        container.appendChild(this.el);
+        this.header = document.createElement('div');
+        this.header.className = 'rd_tab-header';
+        this.el.appendChild(this.header);
+        this.content = document.createElement('div');
+        this.content.className = 'rd_tab-content';
+        this.el.appendChild(this.content);
+    }
+    appendChild(child) {
+        this.tabList.push(child);
+        const titleNode = document.createElement('div');
+        titleNode.className = 'rd_tab-header-item';
+        if (this.tabList.length === 1)
+            titleNode.classList.add('active');
+        titleNode.textContent = child.title;
+        this.header.appendChild(titleNode);
+        const contentNode = document.createElement('div');
+        contentNode.className = 'rd_tab-content-item';
+        if (this.tabList.length === 1)
+            titleNode.classList.add('active');
+        contentNode.appendChild(child.content);
+        this.content.appendChild(contentNode);
+    }
+    onHeaderClick(e) {
+        const target = e.target;
+        if (!this.header.contains(target))
+            return;
+        const children = Array.from(this.header.children);
+        const index = children.findIndex(node => node === target);
+        this.setActive(index);
+    }
+    setActive(index) {
+        this.state = index;
+        this.tabList.forEach((item, i) => {
+            if (i === index) {
+                this.header.children[i].classList.add('active');
+                this.content.children[i].classList.add('active');
+            }
+            this.header.children[i].classList.remove('active');
+            this.content.children[i].classList.remove('active');
+        });
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (Tab);
+
+
+/***/ }),
+
 /***/ "./src/core/command.ts":
 /*!*****************************!*\
   !*** ./src/core/command.ts ***!
@@ -1070,9 +1200,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _controls_colorButton__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../controls/colorButton */ "./src/controls/colorButton.ts");
 /* harmony import */ var _controls_colorPicker__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../controls/colorPicker */ "./src/controls/colorPicker.ts");
 /* harmony import */ var _controls_linkDialog__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../controls/linkDialog */ "./src/controls/linkDialog.ts");
+/* harmony import */ var _controls_imageDialog__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../controls/imageDialog */ "./src/controls/imageDialog.ts");
 /**
  * 控件管理类
  */
+
 
 
 
@@ -1090,6 +1222,7 @@ class Control {
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('colorPicker', _controls_colorPicker__WEBPACK_IMPORTED_MODULE_6__["default"]);
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('colorButton', _controls_colorButton__WEBPACK_IMPORTED_MODULE_5__["default"]);
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('linkDialog', _controls_linkDialog__WEBPACK_IMPORTED_MODULE_7__["default"]);
+        _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('imageDialog', _controls_imageDialog__WEBPACK_IMPORTED_MODULE_8__["default"]);
     }
     register(name, control) {
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl(name, control);

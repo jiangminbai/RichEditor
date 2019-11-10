@@ -59,7 +59,13 @@ class Tab extends Emitter {
 
     const children = Array.from(this.header.children);
     const index = children.findIndex(node => node === target);
+    
+    this.setActive(index);
+  }
+
+  public setActive(index: number) {
     this.state = index;
+
     this.tabList.forEach((item, i) => {
       if (i === index) {
         this.header.children[i].classList.add('active');
@@ -70,3 +76,5 @@ class Tab extends Emitter {
     })
   }
 }
+
+export default Tab;
