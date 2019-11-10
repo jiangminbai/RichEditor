@@ -2093,7 +2093,7 @@ class Link {
         this.button.on('click', (e) => this.onClick(e));
         const LinkDialog = control.require('linkDialog');
         this.linkDialog = new LinkDialog(this.button.el, {
-            title: '链接'
+            title: '编辑链接'
         });
         this.linkDialog.on('confirm', (href, text, title) => this.insertHref(href, text, title));
         editor.on('rangechange', this.onRangeChange.bind(this));
