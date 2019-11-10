@@ -1021,21 +1021,25 @@ class SelectMenu extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = (function (editor, commandName, showDefaultUI, ...args) {
-    if (commandName === 'link') {
-        const startContainer = editor.range.startContainer;
-        const parentNode = startContainer.parentNode;
-        if (parentNode.tagName === 'A') {
-            parentNode.setAttribute('href', args[0]);
-            parentNode.setAttribute('title', args[2]);
-            parentNode.textContent = args[1];
+    if (commandName === 'createLink') {
+        let range = editor.range;
+        let startContainer = editor.range.startContainer;
+        let parentNode = startContainer.parentNode;
+        // 光标不在a标签内，先通过document.execCommand创建链接
+        if (parentNode.tagName !== 'A') {
+            document.execCommand(commandName, showDefaultUI, args[0]);
+            range = editor.selection.getRangeAt(0); // 内部range对象是异步更新的，所以直接获取最新range
+            startContainer = range.startContainer;
+            parentNode = startContainer.parentNode;
         }
-        else {
-            const a = document.createElement('a');
-            a.setAttribute('href', args[0]);
-            a.setAttribute('title', args[2]);
-            a.textContent = args[1];
-            parentNode.insertBefore(a, startContainer);
-        }
+        // 设置属性、链接、文字
+        parentNode.setAttribute('href', args[0]);
+        parentNode.setAttribute('title', args[2]);
+        parentNode.textContent = args[1];
+        // 设置范围对象起始点
+        const node = parentNode.firstChild;
+        range.setStart(node, 0);
+        range.setEnd(node, node.length);
         return;
     }
     document.execCommand(commandName, showDefaultUI, args[0]);
@@ -1146,6 +1150,7 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         });
         document.addEventListener('selectionchange', () => {
             const selection = window.getSelection();
+            this.selection = selection;
             if (!selection.rangeCount)
                 return;
             const range = selection.getRangeAt(0);
@@ -1186,7 +1191,7 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.restoreSelection();
         Object(_command__WEBPACK_IMPORTED_MODULE_1__["default"])(this, commandName, showDefaultUI, ...args);
         // document.execCommand(commandName, showDefaultUI, value);
-        this.range = this.selection.getRangeAt(0);
+        this.range = this.selection.getRangeAt(0); // 必须直接获取，因为内部range对象还未更新
         this.fireRangeChange();
     }
     // 选中选区是否与工具栏模式匹配
@@ -2078,7 +2083,7 @@ class Link {
         this.linkDialog.open();
     }
     insertHref(href, text, title) {
-        this.editor.execCommand('link', false, href, text, title);
+        this.editor.execCommand('createLink', false, href, text, title);
     }
     onRangeChange() {
     }

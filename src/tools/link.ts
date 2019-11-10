@@ -35,7 +35,7 @@ class Link {
   }
 
   insertHref(href: string, text: string, title: string) {
-    this.editor.execCommand('link', false, href, text, title);
+    this.editor.execCommand('createLink', false, href, text, title);
   }
 
   onRangeChange() {

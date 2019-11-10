@@ -57,6 +57,7 @@ class Editor extends Emitter {
 
     document.addEventListener('selectionchange', () => {
       const selection = window.getSelection();
+      this.selection = selection;
       if (!selection.rangeCount) return;
       const range = selection.getRangeAt(0);
       if (!this.el.contains(range.startContainer)) return;
@@ -100,7 +101,7 @@ class Editor extends Emitter {
     this.restoreSelection();
     command(this, commandName, showDefaultUI, ...args);
     // document.execCommand(commandName, showDefaultUI, value);
-    this.range = this.selection.getRangeAt(0);
+    this.range = this.selection.getRangeAt(0); // 必须直接获取，因为内部range对象还未更新
     this.fireRangeChange();
   }
 
