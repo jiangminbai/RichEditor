@@ -1,0 +1,28 @@
+// 上传图片
+.rd_upload-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 200px;
+  height: 200px;
+  border: 2px dashed #000;
+  font-size: 14px;
+  color: #666;
+
+  &.active {
+    border-color: $hover-color;
+  }
+}
+
+.rd_upload-button {
+  outline: none;
+  border: 1px solid #000;
+  background: #fff;
+  margin-top: 10px;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: $hover-color;
+  }
+}

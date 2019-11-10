@@ -1146,6 +1146,93 @@ class Tab extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
+/***/ "./src/controls/uploadImage.ts":
+/*!*************************************!*\
+  !*** ./src/controls/uploadImage.ts ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core_emitter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core/emitter */ "./src/core/emitter.ts");
+/**
+ * 上传图片
+ */
+
+class UploadImage extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor(container) {
+        super();
+        this.createElement(container);
+        this.uploadBtn.addEventListener('click', (e) => this.upload(e));
+        this.fileElem.addEventListener('change', (e) => this.onFileChange(e));
+        this.el.addEventListener('dragenter', (e) => this.onDragEnter(e));
+        this.el.addEventListener('dragleave', (e) => this.onDragLeave(e));
+        this.el.addEventListener('dragover', (e) => this.onDragOver(e));
+        this.el.addEventListener('drop', (e) => this.onDrop(e));
+    }
+    createElement(container) {
+        this.el = document.createElement('div');
+        this.el.className = 'rd_upload-image';
+        const desc = document.createElement('div');
+        desc.className = 'rd_upload-image-desc';
+        desc.textContent = '拖拽一张图片至此';
+        this.el.appendChild(desc);
+        this.uploadBtn = document.createElement('button');
+        this.uploadBtn.className = 'rd_upload-button';
+        this.uploadBtn.innerHTML = '上传图片<input type="file" accept="image/*" style="display:none">';
+        this.fileElem = this.uploadBtn.querySelector('input');
+        this.el.appendChild(this.uploadBtn);
+        container.appendChild(this.el);
+    }
+    upload(e) {
+        this.fileElem.click();
+    }
+    onFileChange(e) {
+        const file = this.fileElem.files[0];
+        this.handleFile(file);
+    }
+    onDragEnter(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+    onDragOver(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        const target = e.target;
+        if (target === this.el || this.el.contains(target))
+            this.el.classList.add('active');
+    }
+    onDragLeave(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        const target = e.target;
+        if (target === this.el)
+            this.el.classList.remove('active');
+    }
+    onDrop(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        const target = e.target;
+        if (target === this.el)
+            this.el.classList.remove('active');
+        const file = e.dataTransfer.files[0];
+        this.handleFile(file);
+    }
+    handleFile(file) {
+        const render = new FileReader();
+        render.onload = (e) => {
+            this.fire('change', e.target.result);
+            console.log(e.target.result);
+        };
+        render.readAsDataURL(file);
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (UploadImage);
+
+
+/***/ }),
+
 /***/ "./src/core/command.ts":
 /*!*****************************!*\
   !*** ./src/core/command.ts ***!
@@ -1201,9 +1288,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _controls_colorPicker__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../controls/colorPicker */ "./src/controls/colorPicker.ts");
 /* harmony import */ var _controls_linkDialog__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../controls/linkDialog */ "./src/controls/linkDialog.ts");
 /* harmony import */ var _controls_imageDialog__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../controls/imageDialog */ "./src/controls/imageDialog.ts");
+/* harmony import */ var _controls_uploadImage__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../controls/uploadImage */ "./src/controls/uploadImage.ts");
 /**
  * 控件管理类
  */
+
 
 
 
@@ -1223,6 +1312,7 @@ class Control {
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('colorButton', _controls_colorButton__WEBPACK_IMPORTED_MODULE_5__["default"]);
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('linkDialog', _controls_linkDialog__WEBPACK_IMPORTED_MODULE_7__["default"]);
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('imageDialog', _controls_imageDialog__WEBPACK_IMPORTED_MODULE_8__["default"]);
+        _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl('uploadImage', _controls_uploadImage__WEBPACK_IMPORTED_MODULE_9__["default"]);
     }
     register(name, control) {
         _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerControl(name, control);

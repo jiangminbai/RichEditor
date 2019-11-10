@@ -12,6 +12,7 @@ import ColorButton from '../controls/colorButton';
 import ColorPicker from '../controls/colorPicker';
 import LinkDialog from '../controls/linkDialog';
 import ImageDialog from '../controls/imageDialog';
+import UploadImage from '../controls/uploadImage';
 
 class Control {
   constructor() {
@@ -23,6 +24,7 @@ class Control {
     registry.registerControl('colorButton', ColorButton);
     registry.registerControl('linkDialog', LinkDialog);
     registry.registerControl('imageDialog', ImageDialog);
+    registry.registerControl('uploadImage', UploadImage);
   }
 
   register(name: string, control) {

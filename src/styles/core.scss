@@ -20,7 +20,7 @@
   }
 
   &.active > svg {
-    fill: #F44336;
+    fill: $hover-color;
   }
 }
 .richeditor_area {

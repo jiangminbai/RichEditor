@@ -39,7 +39,7 @@
     cursor: pointer;
 
     &:hover, &.active {
-      background: #F44336;
+      background: $hover-color;
       color: #fff;
     }
   }

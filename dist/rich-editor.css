@@ -18,7 +18,7 @@
   margin: 4px 2px;
 }
 .richeditor_toolbarItem.active > svg {
-  fill: #F44336;
+  fill: #ff9800;
 }
 
 .richeditor_area {
@@ -63,7 +63,7 @@
   cursor: pointer;
 }
 .rd_select-menu li:hover, .rd_select-menu li.active {
-  background: #F44336;
+  background: #ff9800;
   color: #fff;
 }
 
@@ -243,7 +243,33 @@
   color: #ccc;
 }
 .rd_form-group .rd_form-input:focus {
-  border-color: #F44336;
+  border-color: #ff9800;
+}
+
+.rd_upload-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 200px;
+  height: 200px;
+  border: 2px dashed #000;
+  font-size: 14px;
+  color: #666;
+}
+.rd_upload-image.active {
+  border-color: #ff9800;
+}
+
+.rd_upload-button {
+  outline: none;
+  border: 1px solid #000;
+  background: #fff;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.rd_upload-button:hover {
+  border-color: #ff9800;
 }
 
 /*# sourceMappingURL=rich-editor.css.map*/
