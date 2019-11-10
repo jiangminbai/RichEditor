@@ -41,6 +41,12 @@ class LinkDialog extends Dialog {
     this.text = this.content.querySelector('.rd_form-text');
     this.title = this.content.querySelector('.rd_form-title');
   }
+
+  public setValue(href: string, text: string, title) {
+    this.href.value = href;
+    this.text.value = text;
+    this.title.value = title;
+  }
 }
 
 export default LinkDialog;

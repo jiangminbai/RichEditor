@@ -805,6 +805,11 @@ class LinkDialog extends _dialog__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.text = this.content.querySelector('.rd_form-text');
         this.title = this.content.querySelector('.rd_form-title');
     }
+    setValue(href, text, title) {
+        this.href.value = href;
+        this.text.value = text;
+        this.title.value = title;
+    }
 }
 /* harmony default export */ __webpack_exports__["default"] = (LinkDialog);
 
@@ -1193,6 +1198,22 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         // document.execCommand(commandName, showDefaultUI, value);
         this.range = this.selection.getRangeAt(0); // 必须直接获取，因为内部range对象还未更新
         this.fireRangeChange();
+    }
+    // 获取选中的范围对象回溯的节点链
+    getNodeChain() {
+        const range = this.range;
+        if (!range)
+            return [];
+        // 获取节点链
+        const startContainer = range.startContainer;
+        let node = startContainer;
+        const nodeChain = []; // 点击位置往上搜集的节点链
+        while (node.nodeType === 3 || node !== this.el) {
+            if (node.nodeType !== 3)
+                nodeChain.push(node); // 排除text节点
+            node = node.parentNode;
+        }
+        return nodeChain;
     }
     // 选中选区是否与工具栏模式匹配
     match(matchPattern) {
@@ -2086,6 +2107,14 @@ class Link {
         this.editor.execCommand('createLink', false, href, text, title);
     }
     onRangeChange() {
+        const nodeChain = this.editor.getNodeChain();
+        const node = nodeChain.find(node => node.tagName === 'A');
+        if (!node)
+            return this.linkDialog.setValue('', '', '');
+        const href = node.getAttribute('href');
+        const text = node.textContent;
+        const title = node.getAttribute('title');
+        this.linkDialog.setValue(href, text, title);
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Link);

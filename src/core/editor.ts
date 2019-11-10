@@ -105,6 +105,23 @@ class Editor extends Emitter {
     this.fireRangeChange();
   }
 
+  // 获取选中的范围对象回溯的节点链
+  public getNodeChain() {
+    const range = this.range;
+    if (!range) return [];
+    
+    // 获取节点链
+    const startContainer = range.startContainer;
+    let node = startContainer;
+    const nodeChain: HTMLElement[] = []; // 点击位置往上搜集的节点链
+    while(node.nodeType === 3 || node !== this.el) {
+      if (node.nodeType !== 3) nodeChain.push(<HTMLElement>node); // 排除text节点
+      node = node.parentNode
+    }
+
+    return nodeChain;
+  }
+
   // 选中选区是否与工具栏模式匹配
   public match(matchPattern: MatchPattern): any {
     const range = this.range;

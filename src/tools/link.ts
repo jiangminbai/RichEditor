@@ -25,7 +25,6 @@ class Link {
       title: '链接'
     });
     this.linkDialog.on('confirm', (href, text, title) => this.insertHref(href, text, title));
-    
     editor.on('rangechange', this.onRangeChange.bind(this));
   }
 
@@ -39,7 +38,13 @@ class Link {
   }
 
   onRangeChange() {
-
+    const nodeChain = this.editor.getNodeChain();
+    const node = nodeChain.find(node => node.tagName === 'A');
+    if (!node) return this.linkDialog.setValue('', '', '');
+    const href = node.getAttribute('href');
+    const text = node.textContent;
+    const title = node.getAttribute('title');
+    this.linkDialog.setValue(href, text, title);
   }
 }
 
