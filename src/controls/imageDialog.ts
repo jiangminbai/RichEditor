@@ -32,7 +32,7 @@ class ImageDialog extends Dialog {
     })
   }
 
-  public createNetImageContent() {
+  private createNetImageContent() {
     this.netImageContent = document.createElement('div');
     this.netImageContent.className = 'rd_imagedialog-net';
     const form =
@@ -49,16 +49,19 @@ class ImageDialog extends Dialog {
     this.alt = this.netImageContent.querySelector('.rd_form-alt');
   }
 
-  public createLocalImageContent() {
+  private createLocalImageContent() {
     this.localImageContent = document.createElement('div');
     this.localImageContent.className = 'rd_imagedialog-local';
     const uploadImage = new UploadImage(this.localImageContent);
+    uploadImage.on('change', result => {
+      this.tab.setActive(0);
+      this.url.value = result;
+    })
   }
 
-  public setValue(href: string, text: string, title) {
-    // this.href.value = href;
-    // this.text.value = text;
-    // this.title.value = title;
+  public setValue(url: string, alt: string) {
+    this.url.value = url;
+    this.alt.value = alt;
   }
 }
 

@@ -55,7 +55,7 @@ class Tab extends Emitter {
 
   private onHeaderClick(e: MouseEvent) {
     const target = <HTMLElement>e.target;
-    if (!this.header.contains(target)) return;
+    if (!this.header.contains(target) || this.header === target) return;
 
     const children = Array.from(this.header.children);
     const index = children.findIndex(node => node === target);

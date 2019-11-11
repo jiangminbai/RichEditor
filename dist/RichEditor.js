@@ -701,13 +701,11 @@ class Dialog extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor(element, options) {
         super();
         this.visible = false;
+        this.triggerEl = element;
         this.options = Object.assign({}, options);
         this.createSkeleton(element);
         this.createHeader();
         this.createFooter();
-        const bounding = element.getBoundingClientRect();
-        this.el.style.left = bounding.left + 'px';
-        this.el.style.top = bounding.bottom + 'px';
         document.body.appendChild(this.el);
     }
     createSkeleton(element) {
@@ -751,6 +749,20 @@ class Dialog extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.footer.appendChild(this.confirmBtn);
         this.cancelBtn.addEventListener('click', (e) => this.close());
     }
+    // 计算位置
+    calcPos() {
+        const bounding = this.triggerEl.getBoundingClientRect();
+        const elWidth = this.el.clientWidth;
+        const elHeight = this.el.clientHeight;
+        const bodyWidth = document.body.clientWidth;
+        let left = bounding.left;
+        let top = bounding.bottom;
+        if ((elWidth + bounding.left) > bodyWidth) {
+            left = bodyWidth - elWidth;
+        }
+        this.el.style.left = left + 'px';
+        this.el.style.top = top + 'px';
+    }
     close() {
         this.el.style.display = 'none';
         this.visible = false;
@@ -758,6 +770,7 @@ class Dialog extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
     open() {
         this.el.style.display = 'block';
         this.visible = true;
+        this.calcPos();
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Dialog);
@@ -815,11 +828,14 @@ class ImageDialog extends _dialog__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.localImageContent = document.createElement('div');
         this.localImageContent.className = 'rd_imagedialog-local';
         const uploadImage = new _uploadImage__WEBPACK_IMPORTED_MODULE_2__["default"](this.localImageContent);
+        uploadImage.on('change', result => {
+            this.tab.setActive(0);
+            this.url.value = result;
+        });
     }
-    setValue(href, text, title) {
-        // this.href.value = href;
-        // this.text.value = text;
-        // this.title.value = title;
+    setValue(url, alt) {
+        this.url.value = url;
+        this.alt.value = alt;
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (ImageDialog);
@@ -1127,7 +1143,7 @@ class Tab extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
     }
     onHeaderClick(e) {
         const target = e.target;
-        if (!this.header.contains(target))
+        if (!this.header.contains(target) || this.header === target)
             return;
         const children = Array.from(this.header.children);
         const index = children.findIndex(node => node === target);
@@ -1269,6 +1285,14 @@ __webpack_require__.r(__webpack_exports__);
         range.setEnd(node, node.length);
         return;
     }
+    if (commandName === 'insertImage') {
+        const img = document.createElement('img');
+        img.src = args[0];
+        img.alt = args[1];
+        editor.range.insertNode(img);
+        editor.range.selectNode(img);
+        return;
+    }
     document.execCommand(commandName, showDefaultUI, args[0]);
 });
 
@@ -1393,27 +1417,21 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
             this.fireRangeChange();
         });
     }
-    // 当执行document.execCommand时，Selection.getRangeAt(0)中的range对象会被覆盖掉
-    // getRange(): any {
-    //   return this.selection.rangeCount ? this.selection.getRangeAt(0): null;
-    // }
     // 选区范围对象发生变化
     fireRangeChange() {
         this.fire('rangechange', this.range);
     }
-    // 当鼠标离开编辑区域时，为了恢复选区而保存选区范围对象
-    // handleMouseLeave() {
-    //   if (this.selection && this.selection.rangeCount) {
-    //     this.range = this.selection.getRangeAt(0);
-    //   }
-    // }
     // 恢复选区
-    // 当点击toolbar时，编辑区会失去焦点, range对象无法通过selection.getRangeAt(0)获取
+    // 当编辑区会失去焦点(比如点击toolbar), selection持有的range对象不指向编辑区
     restoreSelection() {
         if (this.range) {
             this.selection.removeAllRanges();
             this.selection.addRange(this.range);
         }
+    }
+    // 当执行document.execCommand时，选区对象中的范围对象被改变，需要重新保存范围对象
+    saveRange() {
+        this.range = this.selection.getRangeAt(0);
     }
     // 使用document.execCommand命令时，需要一些额外的操作
     // 1.先focus文本编辑区
@@ -1423,8 +1441,7 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.el.focus();
         this.restoreSelection();
         Object(_command__WEBPACK_IMPORTED_MODULE_1__["default"])(this, commandName, showDefaultUI, ...args);
-        // document.execCommand(commandName, showDefaultUI, value);
-        this.range = this.selection.getRangeAt(0); // 必须直接获取，因为内部range对象还未更新
+        this.saveRange();
         this.fireRangeChange();
     }
     // 获取选中的范围对象回溯的节点链
@@ -1833,9 +1850,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tools_foreColor__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../tools/foreColor */ "./src/tools/foreColor.ts");
 /* harmony import */ var _tools_textBgColor__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../tools/textBgColor */ "./src/tools/textBgColor.ts");
 /* harmony import */ var _tools_link__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../tools/link */ "./src/tools/link.ts");
+/* harmony import */ var _tools_insertImage__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../tools/insertImage */ "./src/tools/insertImage.ts");
 /**
  * 工具栏类
  */
+
 
 
 
@@ -1925,6 +1944,10 @@ class Toolbar {
             {
                 name: 'link',
                 module: new _tools_link__WEBPACK_IMPORTED_MODULE_16__["default"]()
+            },
+            {
+                name: 'insert-image',
+                module: new _tools_insertImage__WEBPACK_IMPORTED_MODULE_17__["default"]()
             }
         ];
         plugins.forEach(plugin => {
@@ -2141,6 +2164,56 @@ class ForeColor {
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (ForeColor);
+
+
+/***/ }),
+
+/***/ "./src/tools/insertImage.ts":
+/*!**********************************!*\
+  !*** ./src/tools/insertImage.ts ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/**
+ * 插入图片插件
+ */
+class InsertImage {
+    install(context) {
+        const { editor, svgs, toolbar, control } = context;
+        this.editor = editor;
+        const Button = control.require('button');
+        this.button = new Button(toolbar.el);
+        this.button.setIcon(svgs.image);
+        this.button.on('click', (e) => this.onClick(e));
+        const ImageDialog = control.require('imageDialog');
+        this.imageDialog = new ImageDialog(this.button.el, {
+            title: '编辑图片'
+        });
+        this.imageDialog.on('confirm', (url, alt) => this.insertUrl(url, alt));
+        editor.on('rangechange', this.onRangeChange.bind(this));
+    }
+    onClick(e) {
+        if (this.imageDialog.visible)
+            return this.imageDialog.close();
+        this.imageDialog.open();
+    }
+    insertUrl(url, alt) {
+        this.editor.execCommand('insertImage', false, url, alt);
+    }
+    onRangeChange() {
+        // const nodeChain = this.editor.getNodeChain();
+        // const node = nodeChain.find(node => node.tagName === 'A');
+        // if (!node) return this.imageDialog.setValue('', '');
+        // const href = node.getAttribute('href');
+        // const text = node.textContent;
+        // const title = node.getAttribute('title');
+        // this.imageDialog.setValue(href, text);
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (InsertImage);
 
 
 /***/ }),

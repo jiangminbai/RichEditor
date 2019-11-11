@@ -11,6 +11,7 @@ interface DialogOptions {
 
 class Dialog extends Emitter {
   public el: HTMLElement;
+  private triggerEl: HTMLElement;
   public header: HTMLElement;
   public content: HTMLElement;
   public footer: HTMLElement;
@@ -22,20 +23,17 @@ class Dialog extends Emitter {
   constructor(element:HTMLElement, options: DialogOptions) {
     super();
 
+    this.triggerEl = element;
     this.options = Object.assign({}, options);
 
     this.createSkeleton(element);
     this.createHeader();
     this.createFooter();
 
-    const bounding = element.getBoundingClientRect();
-    this.el.style.left = bounding.left + 'px';
-    this.el.style.top = bounding.bottom + 'px';
-
     document.body.appendChild(this.el);
   }
 
-  public createSkeleton(element: HTMLElement) {
+  private createSkeleton(element: HTMLElement) {
     this.el = document.createElement('div');
     this.el.className = 'rd_dialog';
     this.el.style.display = 'none';
@@ -59,7 +57,7 @@ class Dialog extends Emitter {
     })
   }
 
-  public createHeader() {
+  private createHeader() {
     const title = document.createElement('p');
     title.className = 'rd_dialog-title';
     title.textContent = this.options.title;
@@ -73,7 +71,7 @@ class Dialog extends Emitter {
     close.addEventListener('click', (e: MouseEvent) => this.close());
   }
 
-  public createFooter() {
+  private createFooter() {
     this.cancelBtn = document.createElement('button');
     this.cancelBtn.className = 'rd_dialog-cancel-btn';
     this.cancelBtn.textContent = '取消';
@@ -87,6 +85,23 @@ class Dialog extends Emitter {
     this.cancelBtn.addEventListener('click', (e: MouseEvent) => this.close());
   }
 
+  // 计算位置
+  private calcPos() {
+    const bounding = this.triggerEl.getBoundingClientRect();
+    const elWidth = this.el.clientWidth;
+    const elHeight = this.el.clientHeight;
+    const bodyWidth = document.body.clientWidth;
+
+    let left = bounding.left;
+    let top = bounding.bottom;
+    if ((elWidth + bounding.left) > bodyWidth) {
+      left = bodyWidth - elWidth;
+    }
+
+    this.el.style.left = left + 'px';
+    this.el.style.top = top + 'px';
+  }
+
   public close() {
     this.el.style.display = 'none';
     this.visible = false;
@@ -95,7 +110,10 @@ class Dialog extends Emitter {
   public open() {
     this.el.style.display = 'block';
     this.visible = true;
+    this.calcPos();
   }
+
+  
 }
 
 export default Dialog;

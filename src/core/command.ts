@@ -29,5 +29,16 @@ export default function(editor: Editor, commandName: string, showDefaultUI: bool
     return;
   }
 
+  if (commandName === 'insertImage') {
+    const img = document.createElement('img');
+    img.src = args[0];
+    img.alt = args[1];
+
+    editor.range.insertNode(img);
+    editor.range.selectNode(img);
+
+    return;
+  }
+
   document.execCommand(commandName, showDefaultUI, args[0]);
 }

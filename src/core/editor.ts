@@ -66,30 +66,24 @@ class Editor extends Emitter {
     })
   }
 
-  // 当执行document.execCommand时，Selection.getRangeAt(0)中的range对象会被覆盖掉
-  // getRange(): any {
-  //   return this.selection.rangeCount ? this.selection.getRangeAt(0): null;
-  // }
-
   // 选区范围对象发生变化
   private fireRangeChange() {
     this.fire('rangechange', this.range);
   }
 
-  // 当鼠标离开编辑区域时，为了恢复选区而保存选区范围对象
-  // handleMouseLeave() {
-  //   if (this.selection && this.selection.rangeCount) {
-  //     this.range = this.selection.getRangeAt(0);
-  //   }
-  // }
 
   // 恢复选区
-  // 当点击toolbar时，编辑区会失去焦点, range对象无法通过selection.getRangeAt(0)获取
+  // 当编辑区会失去焦点(比如点击toolbar), selection持有的range对象不指向编辑区
   public restoreSelection() {
     if (this.range) {
       this.selection.removeAllRanges();
       this.selection.addRange(this.range);
     }
+  }
+
+  // 当执行document.execCommand时，选区对象中的范围对象被改变，需要重新保存范围对象
+  public saveRange() {
+    this.range = this.selection.getRangeAt(0);
   }
 
   // 使用document.execCommand命令时，需要一些额外的操作
@@ -100,8 +94,7 @@ class Editor extends Emitter {
     this.el.focus();
     this.restoreSelection();
     command(this, commandName, showDefaultUI, ...args);
-    // document.execCommand(commandName, showDefaultUI, value);
-    this.range = this.selection.getRangeAt(0); // 必须直接获取，因为内部range对象还未更新
+    this.saveRange();
     this.fireRangeChange();
   }
 

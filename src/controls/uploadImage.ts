@@ -21,7 +21,7 @@ class UploadImage extends Emitter {
     this.el.addEventListener('drop', (e: DragEvent) => this.onDrop(e));
   }
 
-  createElement(container: HTMLElement) {
+  private createElement(container: HTMLElement) {
     this.el = document.createElement('div');
     this.el.className = 'rd_upload-image';
     
@@ -39,21 +39,21 @@ class UploadImage extends Emitter {
     container.appendChild(this.el);
   }
 
-  upload(e: MouseEvent) {
+  private upload(e: MouseEvent) {
     this.fileElem.click();
   }
 
-  onFileChange(e: MouseEvent) {
+  private onFileChange(e: MouseEvent) {
     const file = this.fileElem.files[0];
     this.handleFile(file);
   }
 
-  onDragEnter(e: DragEvent) {
+  private onDragEnter(e: DragEvent) {
     e.stopPropagation();
     e.preventDefault();
   }
 
-  onDragOver(e: DragEvent) {
+  private onDragOver(e: DragEvent) {
     e.stopPropagation();
     e.preventDefault();
 
@@ -61,7 +61,7 @@ class UploadImage extends Emitter {
     if (target === this.el || this.el.contains(target)) this.el.classList.add('active');
   }
 
-  onDragLeave(e: DragEvent) {
+  private onDragLeave(e: DragEvent) {
     e.stopPropagation();
     e.preventDefault();
 
@@ -69,7 +69,7 @@ class UploadImage extends Emitter {
     if (target === this.el) this.el.classList.remove('active');
   }
 
-  onDrop(e: DragEvent) {
+  private onDrop(e: DragEvent) {
     e.stopPropagation();
     e.preventDefault();
 
@@ -81,7 +81,7 @@ class UploadImage extends Emitter {
     
   }
 
-  handleFile(file: File) {
+  private handleFile(file: File) {
     const render = new FileReader();
     render.onload = (e) => {
       this.fire('change', <string>e.target.result);

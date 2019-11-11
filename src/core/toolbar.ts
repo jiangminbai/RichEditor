@@ -20,6 +20,7 @@ import FontName from '../tools/fontname';
 import ForeColor from '../tools/foreColor';
 import TextBgColor from '../tools/textBgColor';
 import Link from '../tools/link';
+import InsertImage from '../tools/insertImage';
 
 class Toolbar {
   el: HTMLElement;
@@ -96,6 +97,10 @@ class Toolbar {
       {
         name: 'link',
         module: new Link()
+      },
+      {
+        name: 'insert-image',
+        module: new InsertImage()
       }
     ]
 
