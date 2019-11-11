@@ -14,8 +14,11 @@
 <script src="./dist/richEditor.js"></script>
 <script>
   var richEditor = new RichEditor({el: document.querySelector('.richeditor')});
-  // const LinkDialog = richEditor.control.require('linkDialog');
-  // const link = new LinkDialog(document.body, {title: '链接地址'});
+  const ImageDialog = richEditor.control.require('imageDialog');
+  const imageDialog = new ImageDialog(document.body, {
+    title: '编辑图片'
+  });
+  imageDialog.open();
   // link.open();
 </script>
 </body>

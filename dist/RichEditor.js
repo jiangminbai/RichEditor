@@ -776,9 +776,11 @@ class Dialog extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _dialog__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dialog */ "./src/controls/dialog.ts");
 /* harmony import */ var _tab__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tab */ "./src/controls/tab.ts");
+/* harmony import */ var _uploadImage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./uploadImage */ "./src/controls/uploadImage.ts");
 /**
  * 图片弹窗
  */
+
 
 
 class ImageDialog extends _dialog__WEBPACK_IMPORTED_MODULE_0__["default"] {
@@ -812,6 +814,7 @@ class ImageDialog extends _dialog__WEBPACK_IMPORTED_MODULE_0__["default"] {
     createLocalImageContent() {
         this.localImageContent = document.createElement('div');
         this.localImageContent.className = 'rd_imagedialog-local';
+        const uploadImage = new _uploadImage__WEBPACK_IMPORTED_MODULE_2__["default"](this.localImageContent);
     }
     setValue(href, text, title) {
         // this.href.value = href;
@@ -1092,6 +1095,7 @@ __webpack_require__.r(__webpack_exports__);
 class Tab extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor(container) {
         super();
+        this.tabList = [];
         this.createElement(container);
         this.header.addEventListener('click', (e) => this.onHeaderClick(e));
     }
@@ -1117,7 +1121,7 @@ class Tab extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         const contentNode = document.createElement('div');
         contentNode.className = 'rd_tab-content-item';
         if (this.tabList.length === 1)
-            titleNode.classList.add('active');
+            contentNode.classList.add('active');
         contentNode.appendChild(child.content);
         this.content.appendChild(contentNode);
     }
@@ -1135,6 +1139,7 @@ class Tab extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
             if (i === index) {
                 this.header.children[i].classList.add('active');
                 this.content.children[i].classList.add('active');
+                return;
             }
             this.header.children[i].classList.remove('active');
             this.content.children[i].classList.remove('active');

@@ -14,7 +14,7 @@ class Tab extends Emitter {
   public header: HTMLElement;
   public content: HTMLElement;
   public state: number;
-  public tabList: Child[];
+  public tabList: Child[] = [];
 
   constructor(container: HTMLElement) {
     super();
@@ -48,7 +48,7 @@ class Tab extends Emitter {
 
     const contentNode = document.createElement('div');
     contentNode.className = 'rd_tab-content-item';
-    if (this.tabList.length === 1) titleNode.classList.add('active');
+    if (this.tabList.length === 1) contentNode.classList.add('active');
     contentNode.appendChild(child.content);
     this.content.appendChild(contentNode);
   }
@@ -70,6 +70,7 @@ class Tab extends Emitter {
       if (i === index) {
         this.header.children[i].classList.add('active');
         this.content.children[i].classList.add('active');
+        return;
       }
       this.header.children[i].classList.remove('active');
       this.content.children[i].classList.remove('active');

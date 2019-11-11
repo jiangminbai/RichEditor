@@ -4,6 +4,7 @@
 
 import Dialog from './dialog';
 import Tab from './tab';
+import UploadImage from './uploadImage';
 
 interface DialogOptions {
   title?: string;
@@ -51,6 +52,7 @@ class ImageDialog extends Dialog {
   public createLocalImageContent() {
     this.localImageContent = document.createElement('div');
     this.localImageContent.className = 'rd_imagedialog-local';
+    const uploadImage = new UploadImage(this.localImageContent);
   }
 
   public setValue(href: string, text: string, title) {

@@ -251,11 +251,13 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  width: 200px;
-  height: 200px;
+  max-width: 200px;
+  width: 100%;
+  height: 150px;
   border: 2px dashed #000;
   font-size: 14px;
   color: #666;
+  box-sizing: border-box;
 }
 .rd_upload-image.active {
   border-color: #ff9800;
@@ -270,6 +272,26 @@
 }
 .rd_upload-button:hover {
   border-color: #ff9800;
+}
+
+.rd_tab-header {
+  margin-bottom: 10px;
+}
+.rd_tab-header .rd_tab-header-item {
+  display: inline-block;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+.rd_tab-header .rd_tab-header-item.active {
+  border-bottom: 1px solid #000;
+}
+
+.rd_tab-content .rd_tab-content-item {
+  display: none;
+  margin-bottom: 15px;
+}
+.rd_tab-content .rd_tab-content-item.active {
+  display: block;
 }
 
 /*# sourceMappingURL=rich-editor.css.map*/

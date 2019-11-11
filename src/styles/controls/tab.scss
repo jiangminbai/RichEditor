@@ -1,0 +1,28 @@
+.rd_tab {
+
+}
+
+.rd_tab-header {
+  margin-bottom: 10px;
+
+  .rd_tab-header-item {
+    display: inline-block;
+    padding: 2px 5px;
+    cursor: pointer;
+
+    &.active {
+      border-bottom: 1px solid #000;
+    }
+  }
+}
+
+.rd_tab-content {
+  .rd_tab-content-item {
+    display: none;
+    margin-bottom: 15px;
+
+    &.active {
+      display: block;
+    }
+  }
+}
