@@ -96,6 +96,147 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/builtins/imageScale.ts":
+/*!************************************!*\
+  !*** ./src/builtins/imageScale.ts ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/**
+ * 内置图片缩放功能
+ */
+class ImageScale {
+    constructor(editor) {
+        this.image = null; // 持有当前img对象
+        this.shadowImage = null; // 透明img对象
+        this.editor = editor;
+        this.createDot();
+        this.createShadowImage();
+        this.handleDot();
+        document.addEventListener('click', (e) => this.onClickImage(e));
+    }
+    // 创建透明图片
+    createShadowImage() {
+        this.shadowImage = document.createElement('img');
+        this.shadowImage.style.opacity = '0.5';
+        this.shadowImage.style.position = 'absolute';
+    }
+    // 创建四个点
+    createDot() {
+        this.lt = document.createElement('div');
+        this.lt.className = 'rd_image-scale-dot lt';
+        this.lb = document.createElement('div');
+        this.lb.className = 'rd_image-scale-dot lb';
+        this.rt = document.createElement('div');
+        this.rt.className = 'rd_image-scale-dot rt';
+        this.rb = document.createElement('div');
+        this.rb.className = 'rd_image-scale-dot rb';
+    }
+    handleDot() {
+        let finalWidth;
+        let finalHeight;
+        const handleMouseMove = (e) => {
+            const { left, top, right, bottom, width, height } = this.getImageRect();
+            const { leftc, topc, rightc, bottomc } = this.getImageBoundingRect();
+            const xratio = (e.clientX - leftc) / width;
+            const yratio = (e.clientY - topc) / height;
+            const ratio = Math.min(xratio, yratio);
+            console.log(xratio, yratio, ratio);
+            finalWidth = ratio > 0 ? width * ratio : 20;
+            finalHeight = ratio > 0 ? height * ratio : 20;
+            this.shadowImage.style.width = width * ratio + 'px';
+            this.shadowImage.style.height = height * ratio + 'px';
+        };
+        this.rb.addEventListener('mousedown', () => {
+            this.shadowImage.src = this.image.src;
+            this.shadowImage.style.left = this.getImageRect().left + 'px';
+            this.shadowImage.style.top = this.getImageRect().top + 'px';
+            this.editor.el.appendChild(this.shadowImage);
+            document.body.addEventListener('mousemove', handleMouseMove);
+        });
+        document.body.addEventListener('mouseup', () => {
+            if (this.editor.el.contains(this.shadowImage))
+                this.editor.el.removeChild(this.shadowImage);
+            if (finalWidth && finalHeight && this.image) {
+                this.image.style.width = finalWidth + 'px';
+                this.image.style.height = finalHeight + 'px';
+            }
+            document.body.removeEventListener('mousemove', handleMouseMove);
+        });
+    }
+    onClickImage(e) {
+        const img = e.target;
+        if (this.editor.el.contains(img) && img.tagName === 'IMG') {
+            this.selectImage(img);
+        }
+        else {
+            this.unselectImage();
+        }
+    }
+    // 获取image四个顶点的坐标位置
+    getImageRect() {
+        const offsetTop = this.image.offsetTop;
+        const offsetLeft = this.image.offsetLeft;
+        const offsetWidth = this.image.offsetWidth;
+        const offsetHeight = this.image.offsetHeight;
+        return {
+            top: offsetTop,
+            left: offsetLeft,
+            right: offsetLeft + offsetWidth,
+            bottom: offsetTop + offsetHeight,
+            width: offsetWidth,
+            height: offsetHeight
+        };
+    }
+    getImageBoundingRect() {
+        const { left, top, right, bottom } = this.image.getBoundingClientRect();
+        return {
+            leftc: left,
+            topc: top,
+            rightc: right,
+            bottomc: bottom
+        };
+    }
+    selectImage(img) {
+        if (this.image) {
+            this.image.removeAttribute('data-rd-selected');
+        }
+        this.image = img;
+        this.image.setAttribute('data-rd-selected', "1");
+        this.editor.range.selectNode(this.image);
+        const { left, right, top, bottom } = this.getImageRect();
+        this.editor.el.appendChild(this.lt);
+        this.lt.style.left = (left - this.lt.offsetWidth / 2) + 'px';
+        this.lt.style.top = (top - this.lt.offsetHeight / 2) + 'px';
+        this.editor.el.appendChild(this.lb);
+        this.lb.style.left = (left - this.lb.offsetWidth / 2) + 'px';
+        this.lb.style.top = (bottom - this.lb.offsetHeight / 2) + 'px';
+        this.editor.el.appendChild(this.rt);
+        this.rt.style.left = (right - this.rt.offsetWidth / 2) + 'px';
+        this.rt.style.top = (top - this.rt.offsetHeight / 2) + 'px';
+        this.editor.el.appendChild(this.rb);
+        this.rb.style.left = (right - this.rb.offsetWidth / 2) + 'px';
+        this.rb.style.top = (bottom - this.rb.offsetHeight / 2) + 'px';
+    }
+    unselectImage() {
+        if (this.image) {
+            this.image.removeAttribute('data-rd-selected');
+            this.image = null;
+            this.editor.el.removeChild(this.lt);
+            this.editor.el.removeChild(this.lb);
+            this.editor.el.removeChild(this.rt);
+            this.editor.el.removeChild(this.rb);
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (ImageScale);
+
+
+/***/ }),
+
 /***/ "./src/controls/button.ts":
 /*!********************************!*\
   !*** ./src/controls/button.ts ***!
@@ -1244,12 +1385,43 @@ class UploadImage extends _core_emitter__WEBPACK_IMPORTED_MODULE_0__["default"] 
         const render = new FileReader();
         render.onload = (e) => {
             this.fire('change', e.target.result);
-            console.log(e.target.result);
         };
         render.readAsDataURL(file);
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (UploadImage);
+
+
+/***/ }),
+
+/***/ "./src/core/builtin.ts":
+/*!*****************************!*\
+  !*** ./src/core/builtin.ts ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _registry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./registry */ "./src/core/registry.ts");
+/* harmony import */ var _builtins_imageScale__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../builtins/imageScale */ "./src/builtins/imageScale.ts");
+/**
+ * 控件管理类
+ */
+
+
+class Builtin {
+    constructor(editor) {
+        _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerComponent('imageScale', new _builtins_imageScale__WEBPACK_IMPORTED_MODULE_1__["default"](editor));
+    }
+    register(name, component) {
+        _registry__WEBPACK_IMPORTED_MODULE_0__["default"].registerComponent(name, component);
+    }
+    require(name) {
+        return _registry__WEBPACK_IMPORTED_MODULE_0__["default"].requireComponent(name);
+    }
+}
+/* harmony default export */ __webpack_exports__["default"] = (Builtin);
 
 
 /***/ }),
@@ -1290,7 +1462,9 @@ __webpack_require__.r(__webpack_exports__);
         img.src = args[0];
         img.alt = args[1];
         editor.range.insertNode(img);
-        editor.range.selectNode(img);
+        img.onload = function () {
+            editor.selectImage(img);
+        };
         return;
     }
     document.execCommand(commandName, showDefaultUI, args[0]);
@@ -1366,9 +1540,11 @@ class Control {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _emitter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./emitter */ "./src/core/emitter.ts");
 /* harmony import */ var _command__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./command */ "./src/core/command.ts");
+/* harmony import */ var _builtin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./builtin */ "./src/core/builtin.ts");
 /**
  * 编辑器区域类
  */
+
 
 
 class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
@@ -1376,15 +1552,21 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         super();
         this.selection = null;
         this.range = null;
+        this.createElement(container);
+        this.builtin = new _builtin__WEBPACK_IMPORTED_MODULE_2__["default"](this);
+        this.saveSelection();
+        // 使用keyup监听，使用keydown的话函数执行会超前一步
+        this.el.addEventListener('keyup', this.handleLine.bind(this));
+    }
+    createElement(container) {
+        const areaContainer = document.createElement('div');
+        areaContainer.className = 'rd_area-container';
         this.el = document.createElement('div');
         this.el.className = 'richeditor_area';
         this.el.setAttribute('contenteditable', 'true');
-        container.appendChild(this.el);
+        areaContainer.appendChild(this.el);
+        container.appendChild(areaContainer);
         this.appendP();
-        this.saveSelection();
-        // this.el.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
-        // 使用keyup监听，使用keydown的话函数执行会超前一步
-        this.el.addEventListener('keyup', this.handleLine.bind(this));
     }
     // 使编辑器内部填充p标签
     appendP() {
@@ -1519,6 +1701,11 @@ class Editor extends _emitter__WEBPACK_IMPORTED_MODULE_0__["default"] {
         }
         return false;
     }
+    // 选中编辑区的图片，使其可以拖拽大小
+    selectImage(img) {
+        const imageScale = this.builtin.require('imageScale');
+        imageScale.selectImage(img);
+    }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Editor);
 
@@ -1583,8 +1770,15 @@ __webpack_require__.r(__webpack_exports__);
 // 插件管理器类
 class Registry {
     constructor() {
-        this.plugins = [];
-        this.controls = {};
+        this.components = {}; // 内置的组件
+        this.plugins = []; // 扩展的工具栏
+        this.controls = {}; // UI控件
+    }
+    registerComponent(name, component) {
+        this.components[name] = component;
+    }
+    requireComponent(name) {
+        return this.components[name];
     }
     registerPlugin(name, toolbar) {
         this.plugins.push({
@@ -1638,10 +1832,6 @@ class RichEditor {
         this.editor = new _editor__WEBPACK_IMPORTED_MODULE_2__["default"](this.el);
         // 注册内置工具栏插件
         this.toolbar.registerPlugins(this);
-    }
-    // 对外提供增加svg的接口
-    addIcon(name, svg) {
-        this.svgs[name] = svg;
     }
 }
 /* harmony default export */ __webpack_exports__["default"] = (RichEditor);

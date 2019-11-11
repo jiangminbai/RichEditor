@@ -10,8 +10,17 @@ interface Plugin {
 
 // 插件管理器类
 class Registry {
-  plugins: Plugin[] = [];
-  controls: any = {};
+  components: any = {}; // 内置的组件
+  plugins: Plugin[] = []; // 扩展的工具栏
+  controls: any = {}; // UI控件
+
+  registerComponent(name, component) {
+    this.components[name] = component;
+  }
+
+  requireComponent(name: string) {
+    return this.components[name];
+  }
 
   registerPlugin(name:string, toolbar) {
     this.plugins.push({

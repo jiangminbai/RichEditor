@@ -21,11 +21,43 @@
   fill: #ff9800;
 }
 
-.richeditor_area {
+.rd_area-container {
   height: 400px;
   border: 1px solid #9e9e9e;
-  outline: none;
   overflow: auto;
+}
+
+.richeditor_area {
+  position: relative;
+  min-height: 100%;
+  outline: none;
+}
+.richeditor_area p {
+  margin: 0;
+  line-height: 24px;
+}
+.richeditor_area img {
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.rd_image-scale-dot {
+  width: 10px;
+  height: 10px;
+  background: #ff9800;
+  position: absolute;
+}
+.rd_image-scale-dot.lt {
+  cursor: nw-resize;
+}
+.rd_image-scale-dot.rt {
+  cursor: ne-resize;
+}
+.rd_image-scale-dot.lb {
+  cursor: sw-resize;
+}
+.rd_image-scale-dot.rb {
+  cursor: se-resize;
 }
 
 .rd_select-btn {

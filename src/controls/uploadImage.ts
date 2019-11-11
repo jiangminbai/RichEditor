@@ -85,7 +85,6 @@ class UploadImage extends Emitter {
     const render = new FileReader();
     render.onload = (e) => {
       this.fire('change', <string>e.target.result);
-      console.log(e.target.result);
     }
     render.readAsDataURL(file);
   }

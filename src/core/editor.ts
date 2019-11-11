@@ -3,6 +3,7 @@
  */
 import Emitter from './emitter';
 import command from './command';
+import Builtin from './builtin';
 
 interface MatchPattern {
   type: string, // 可选值'tagName' | 'style' | 'tagNameAttribute',
@@ -16,20 +17,28 @@ class Editor extends Emitter {
   el: HTMLElement;
   selection: Selection = null;
   range: Range = null;
+  builtin: Builtin;
 
   constructor(container: HTMLElement) {
     super();
 
+    this.createElement(container);
+    this.builtin = new Builtin(this);
+
+    this.saveSelection();
+    // 使用keyup监听，使用keydown的话函数执行会超前一步
+    this.el.addEventListener('keyup', this.handleLine.bind(this));
+  }
+
+  private createElement(container: HTMLElement) {
+    const areaContainer = document.createElement('div');
+    areaContainer.className = 'rd_area-container';
     this.el = document.createElement('div');
     this.el.className = 'richeditor_area';
     this.el.setAttribute('contenteditable', 'true');
-    container.appendChild(this.el);
+    areaContainer.appendChild(this.el);
+    container.appendChild(areaContainer);
     this.appendP();
-
-    this.saveSelection();
-    // this.el.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
-    // 使用keyup监听，使用keydown的话函数执行会超前一步
-    this.el.addEventListener('keyup', this.handleLine.bind(this));
   }
 
   // 使编辑器内部填充p标签
@@ -168,6 +177,12 @@ class Editor extends Emitter {
       }
     }
     return false;
+  }
+
+  // 选中编辑区的图片，使其可以拖拽大小
+  public selectImage(img: HTMLImageElement) {
+    const imageScale = this.builtin.require('imageScale');
+    imageScale.selectImage(img);
   }
 }
 

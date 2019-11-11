@@ -31,11 +31,6 @@ class RichEditor {
     // 注册内置工具栏插件
     this.toolbar.registerPlugins(this);
   }
-
-  // 对外提供增加svg的接口
-  addIcon(name: string, svg: string) {
-    this.svgs[name] = svg;
-  }
 }
 
 export default RichEditor;

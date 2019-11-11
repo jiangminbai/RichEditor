@@ -35,7 +35,9 @@ export default function(editor: Editor, commandName: string, showDefaultUI: bool
     img.alt = args[1];
 
     editor.range.insertNode(img);
-    editor.range.selectNode(img);
+    img.onload = function() {
+      editor.selectImage(img);
+    }
 
     return;
   }
