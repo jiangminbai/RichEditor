@@ -42,6 +42,16 @@
   img {
     cursor: pointer;
     vertical-align: middle;
+
+    &[data-rd-selected] {
+      border: 2px solid $hover-color;
+    }
+
+    &.rd_shadow-image {
+      opacity: 0.5;
+      position: absolute;
+      pointer-events: none; // 避免被鼠标拖拽到
+    }
   }
 }
 

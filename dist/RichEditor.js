@@ -121,8 +121,7 @@ class ImageScale {
     // 创建透明图片
     createShadowImage() {
         this.shadowImage = document.createElement('img');
-        this.shadowImage.style.opacity = '0.5';
-        this.shadowImage.style.position = 'absolute';
+        this.shadowImage.className = 'rd_shadow-image';
     }
     // 创建四个点
     createDot() {
@@ -138,43 +137,101 @@ class ImageScale {
     handleDot() {
         let finalWidth;
         let finalHeight;
+        let ratio = 1;
+        let imageRect;
+        let imageBoundingRect;
+        let tag;
         const handleMouseMove = (e) => {
-            const { left, top, right, bottom, width, height } = this.getImageRect();
-            const { leftc, topc, rightc, bottomc } = this.getImageBoundingRect();
-            const xratio = (e.clientX - leftc) / width;
-            const yratio = (e.clientY - topc) / height;
-            const ratio = Math.min(xratio, yratio);
-            console.log(xratio, yratio, ratio);
-            finalWidth = ratio > 0 ? width * ratio : 20;
-            finalHeight = ratio > 0 ? height * ratio : 20;
-            this.shadowImage.style.width = width * ratio + 'px';
-            this.shadowImage.style.height = height * ratio + 'px';
+            const { left, top, right, bottom, width, height } = imageRect;
+            const { leftc, topc, rightc, bottomc } = imageBoundingRect;
+            let xratio;
+            let yratio;
+            if (tag === 'rb') {
+                xratio = (e.clientX - leftc) / width;
+                yratio = (e.clientY - topc) / height;
+            }
+            if (tag === 'lt') {
+                xratio = (rightc - e.clientX) / width;
+                yratio = (bottomc - e.clientY) / height;
+            }
+            if (tag === 'lb') {
+                xratio = (rightc - e.clientX) / width;
+                yratio = (e.clientY - topc) / height;
+            }
+            if (tag === 'rt') {
+                xratio = (e.clientX - leftc) / width;
+                yratio = (bottomc - e.clientY) / height;
+            }
+            ratio = Math.min(xratio, yratio);
+            finalWidth = width * ratio;
+            finalHeight = height * ratio;
+            if (finalHeight > 20 && finalWidth > 20) {
+                this.shadowImage.style.transform = 'scale(' + ratio + ')';
+            }
         };
         this.rb.addEventListener('mousedown', () => {
             this.shadowImage.src = this.image.src;
-            this.shadowImage.style.left = this.getImageRect().left + 'px';
-            this.shadowImage.style.top = this.getImageRect().top + 'px';
             this.editor.el.appendChild(this.shadowImage);
+            imageRect = this.getImageRect();
+            imageBoundingRect = this.getImageBoundingRect();
+            this.shadowImage.style.width = imageRect.width + 'px';
+            this.shadowImage.style.height = imageRect.height + 'px';
+            this.shadowImage.style.left = imageRect.left + 'px';
+            this.shadowImage.style.top = imageRect.top + 'px';
+            this.shadowImage.style.transformOrigin = 'left top';
+            tag = 'rb';
+            document.body.addEventListener('mousemove', handleMouseMove);
+        });
+        this.lt.addEventListener('mousedown', () => {
+            this.shadowImage.src = this.image.src;
+            this.editor.el.appendChild(this.shadowImage);
+            imageRect = this.getImageRect();
+            imageBoundingRect = this.getImageBoundingRect();
+            this.shadowImage.style.width = imageRect.width + 'px';
+            this.shadowImage.style.height = imageRect.height + 'px';
+            this.shadowImage.style.left = imageRect.left + 'px';
+            this.shadowImage.style.top = imageRect.top + 'px';
+            this.shadowImage.style.transformOrigin = 'right bottom';
+            tag = 'lt';
+            document.body.addEventListener('mousemove', handleMouseMove);
+        });
+        this.lb.addEventListener('mousedown', () => {
+            this.shadowImage.src = this.image.src;
+            this.editor.el.appendChild(this.shadowImage);
+            imageRect = this.getImageRect();
+            imageBoundingRect = this.getImageBoundingRect();
+            this.shadowImage.style.width = imageRect.width + 'px';
+            this.shadowImage.style.height = imageRect.height + 'px';
+            this.shadowImage.style.left = imageRect.left + 'px';
+            this.shadowImage.style.top = imageRect.top + 'px';
+            this.shadowImage.style.transformOrigin = 'right top';
+            tag = 'lb';
+            document.body.addEventListener('mousemove', handleMouseMove);
+        });
+        this.rt.addEventListener('mousedown', () => {
+            this.shadowImage.src = this.image.src;
+            this.editor.el.appendChild(this.shadowImage);
+            imageRect = this.getImageRect();
+            imageBoundingRect = this.getImageBoundingRect();
+            this.shadowImage.style.width = imageRect.width + 'px';
+            this.shadowImage.style.height = imageRect.height + 'px';
+            this.shadowImage.style.left = imageRect.left + 'px';
+            this.shadowImage.style.top = imageRect.top + 'px';
+            this.shadowImage.style.transformOrigin = 'left bottom';
+            tag = 'rt';
             document.body.addEventListener('mousemove', handleMouseMove);
         });
         document.body.addEventListener('mouseup', () => {
-            if (this.editor.el.contains(this.shadowImage))
+            if (this.editor.el.contains(this.shadowImage)) {
+                this.shadowImage.removeAttribute('style');
                 this.editor.el.removeChild(this.shadowImage);
+            }
             if (finalWidth && finalHeight && this.image) {
                 this.image.style.width = finalWidth + 'px';
                 this.image.style.height = finalHeight + 'px';
             }
             document.body.removeEventListener('mousemove', handleMouseMove);
         });
-    }
-    onClickImage(e) {
-        const img = e.target;
-        if (this.editor.el.contains(img) && img.tagName === 'IMG') {
-            this.selectImage(img);
-        }
-        else {
-            this.unselectImage();
-        }
     }
     // 获取image四个顶点的坐标位置
     getImageRect() {
@@ -199,6 +256,15 @@ class ImageScale {
             rightc: right,
             bottomc: bottom
         };
+    }
+    onClickImage(e) {
+        const img = e.target;
+        if (this.editor.el.contains(img) && img.tagName === 'IMG' && img !== this.shadowImage) {
+            this.selectImage(img);
+        }
+        else {
+            this.unselectImage();
+        }
     }
     selectImage(img) {
         if (this.image) {

@@ -40,6 +40,14 @@
   cursor: pointer;
   vertical-align: middle;
 }
+.richeditor_area img[data-rd-selected] {
+  border: 2px solid #ff9800;
+}
+.richeditor_area img.rd_shadow-image {
+  opacity: 0.5;
+  position: absolute;
+  pointer-events: none;
+}
 
 .rd_image-scale-dot {
   width: 10px;
